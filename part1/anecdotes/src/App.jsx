@@ -1,8 +1,19 @@
 import { useState } from 'react'
 
+// Button component
 const Button = (props) => {
   return (
     <button onClick={props.onClick}>{props.text}</button>
+  )
+}
+
+// DisplayAnecdote Component displays anaecdote text with votes
+const DisplayAnecdote = (props) => {
+  return (
+    <>
+      <p>{props.text}</p>
+      <p>has {props.count} votes</p>
+    </>
   )
 }
 
@@ -31,13 +42,26 @@ const App = () => {
     setPoints(copy)
   }
 
+  const getMaxIndex = (array) => {
+      const max =  Math.max(...array);
+      for (let i = 0; i < array.length; i++) {
+        if (array[i] == max)
+          return i;
+      }
+  }
+
+  const maxVotesIndex = getMaxIndex(points)
+
   return (
     <div>
-      <p>{anecdotes[selected]}</p>
-      <p>has {points[selected]} votes</p>
+      <h1>Anecdote of the day</h1>
+      <DisplayAnecdote text={anecdotes[selected]} count={points[selected]}/>
 
       <Button text="vote" onClick={incrementVote}/>
       <Button text="next anecdote" onClick={() => setSelected(getRandom(0,anecdotes.length-1))}/>
+
+      <h1>Anecdote with most votes</h1>
+      <DisplayAnecdote text={anecdotes[maxVotesIndex]} count={points[maxVotesIndex]}/>
 
     </div>
   )
