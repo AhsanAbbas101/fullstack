@@ -9,9 +9,9 @@ const Button = (props) => {
   )
 }
 
-const Display = (props) => {
+const StatisticLine = (props) => {
   return (
-    <p> {props.category + " " + props.count}</p>
+    <p> {props.text + " " + props.value}</p>
   )
 }
 
@@ -23,12 +23,12 @@ const Statistics = (props) => {
     {
       return (
         <div>
-          <Display category="good" count={good}/>
-          <Display category="neutral" count={neutral}/>
-          <Display category="bad" count={bad}/>
-          <Display category="all" count={total}/>
-          <Display category="average" count={(good-bad)/(total)} />
-          <Display category="positive" count={good/(total)  + " %"}/>
+          <StatisticLine text="good"     value={good}/>
+          <StatisticLine text="neutral"  value={neutral}/>
+          <StatisticLine text="bad"      value={bad}/>
+          <StatisticLine text="all"      value={total}/>
+          <StatisticLine text="average"  value={(good-bad)/(total)} />
+          <StatisticLine text="positive" value={good/(total)  + " %"}/>
         </div>
       )
     }
