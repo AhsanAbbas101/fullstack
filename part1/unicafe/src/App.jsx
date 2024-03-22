@@ -19,17 +19,22 @@ const Statistics = (props) => {
     const {good,neutral,bad} = props
     const total = good + neutral + bad
 
-    return (
-      <div>
-        <h1>statistics</h1>
-        <Display category="good" count={good}/>
-        <Display category="neutral" count={neutral}/>
-        <Display category="bad" count={bad}/>
-        <Display category="all" count={total}/>
-        <Display category="average" count={(good-bad)/(total)} />
-        <Display category="positive" count={good/(total)  + " %"}/>
-      </div>
-    )
+    if( total > 0)
+    {
+      return (
+        <div>
+          <Display category="good" count={good}/>
+          <Display category="neutral" count={neutral}/>
+          <Display category="bad" count={bad}/>
+          <Display category="all" count={total}/>
+          <Display category="average" count={(good-bad)/(total)} />
+          <Display category="positive" count={good/(total)  + " %"}/>
+        </div>
+      )
+    }
+    
+    return (<p>No feedback given</p>)
+
 }
 
 const App = () => {
@@ -47,6 +52,7 @@ const App = () => {
         <Button text="bad" onClick={()=> setBad(bad+1)}/>
       </div>
       <div>
+        <h1>statistics</h1>
         <Statistics good={good} neutral={neutral} bad={bad}/>
       </div>
     </div>
