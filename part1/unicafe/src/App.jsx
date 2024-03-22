@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-
+// Button component handles the functionality of each feedback submission button.
 const Button = (props) => {
   return (
     <button onClick={props.onClick}>
@@ -9,32 +9,41 @@ const Button = (props) => {
   )
 }
 
+// StatisticLine component generates a single table row of statistic
 const StatisticLine = (props) => {
-  return (
-    <p> {props.text + " " + props.value}</p>
+  return (  
+    <tr>
+      <td>{props.text}</td>
+      <td>{props.value}</td>
+    </tr>
   )
 }
 
+// Statistics Component displays all the extracted statistics
 const Statistics = (props) => {
     const {good,neutral,bad} = props
     const total = good + neutral + bad
 
-    if( total > 0)
-    {
-      return (
-        <div>
+    // No feedback provided
+    if (total <= 0)
+      return (<p>No feedback given</p>)
+
+    return (
+      <div>
+        
+        <table>
+          <tbody>
           <StatisticLine text="good"     value={good}/>
           <StatisticLine text="neutral"  value={neutral}/>
           <StatisticLine text="bad"      value={bad}/>
           <StatisticLine text="all"      value={total}/>
           <StatisticLine text="average"  value={(good-bad)/(total)} />
-          <StatisticLine text="positive" value={good/(total)  + " %"}/>
-        </div>
-      )
-    }
-    
-    return (<p>No feedback given</p>)
+          <StatisticLine text="positive" value={ (good/(total))*100  + " %"}/>
+          </tbody>
+        </table>
 
+      </div>
+    )
 }
 
 const App = () => {
