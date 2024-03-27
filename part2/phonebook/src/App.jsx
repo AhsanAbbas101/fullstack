@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
-
+//import axios from 'axios'
+import personService from './services/persons'
 
 
 const Filter = ({keyword, onInput}) => {
@@ -45,10 +45,13 @@ const App = () => {
   const [filterInput, setFilterInput] = useState('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
+    personService
+      .getAll()
+      .then(allContacts => {
+        setPersons(allContacts)
+      })
+      .catch(respose => {
+        alert('Failed to retrieve data from server')
       })
   },[])
 
@@ -78,12 +81,19 @@ const App = () => {
     // create new contact
     const personObj = {name: newName, number: newNumber}
 
-    // add new contact
-    setPersons(persons.concat(personObj))
+    personService
+      .create(personObj)
+      .then(returnedPersonObj => {
+        // update state value
+        setPersons(persons.concat(returnedPersonObj))
 
-    // reset form values
-    setNewName('')
-    setNewNumber('')
+        // reset form values
+        setNewName('')
+        setNewNumber('')
+      })
+      .catch(error => {
+        alert(`Failed to add ${newName} to server`)
+      })
   }
 
   const filteredPersons = filterInput === ''
