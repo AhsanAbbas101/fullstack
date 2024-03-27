@@ -14,11 +14,24 @@ const App = () => {
   const handleNewContact = (event) => {
     event.preventDefault()
 
+
+    const personExists = () => {
+      const match = persons.find((person) => 
+                                  person.name.toLowerCase() === newName.toLocaleLowerCase())
+      return match !== undefined
+    }
+
+    if (personExists())
+    {
+      alert(`${newName} is already added to phonebook`)
+      return
+    }
+
     // create new contact
-    const person = {name: newName}
+    const personObj = {name: newName}
 
     // add new contact
-    setPersons(persons.concat(person))
+    setPersons(persons.concat(personObj))
 
     // reset form values
     setNewName('')
