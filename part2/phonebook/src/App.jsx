@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 //import axios from 'axios'
 import personService from './services/persons'
+import axios from 'axios'
 
 
 const Filter = ({keyword, onInput}) => {
@@ -27,13 +28,28 @@ const PersonForm = (props) => {
   )
 }
 
-const DisplayContact = ({person}) => {
-  return(<p>{person.name} {person.number}</p>)
+const DisplayContact = ({person, onDeleteClick}) => {
+  
+  return(
+    <>
+      <p>{person.name} {person.number}</p>
+      <button onClick={() => {
+          if (window.confirm(`Delete ${person.name}?`)) {
+            console.log("running");
+            onDeleteClick(person.id);
+          }
+        } }>
+        delete
+      </button>  
+    </>
+  
+  
+  )
 }
 
-const Persons = ({persons}) => {
+const Persons = ({persons, onDeleteClick}) => {
   return (
-    <div>{ persons.map(person => <DisplayContact key={person.id} person={person}/>)}</div>
+    <div>{ persons.map(person => <DisplayContact key={person.id} person={person} onDeleteClick={onDeleteClick}/>)}</div>
   )
 }
 
@@ -96,6 +112,20 @@ const App = () => {
       })
   }
 
+  const handleDeleteContact = (id) => {
+    personService
+      .remove(id)
+      .then(respose => {
+        console.log(`deletion performed on id ${id}`);
+        
+        setPersons(persons.filter(person => person.id !== id))
+      })
+      .catch(error => {
+
+      })
+
+  }
+
   const filteredPersons = filterInput === ''
     ? persons
     : persons.filter(person => 
@@ -117,7 +147,7 @@ const App = () => {
 
       <h2>Numbers</h2>
 
-      <Persons persons={filteredPersons}/>
+      <Persons persons={filteredPersons} onDeleteClick={handleDeleteContact}/>
       
     </div>
   )
