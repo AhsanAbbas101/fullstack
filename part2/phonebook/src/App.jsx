@@ -75,41 +75,58 @@ const App = () => {
   const handleNewContact = (event) => {
     event.preventDefault()
 
-
-    const personExists = () => {
-      const match = persons.find((person) => 
-                                  person.name.toLowerCase() === newName.toLowerCase())
-      return match !== undefined
-    }
-
-    if (personExists())
+    if (newNumber === '' || newName === '')
     {
-      alert(`${newName} is already added to phonebook.`)
+      alert(`Please enter value.`)
       return
     }
 
-    if (newNumber === '')
+    const match = persons.find((person) => 
+                                person.name.toLowerCase() === newName.toLowerCase())
+
+    if (match !== undefined)
     {
-      alert(`Please enter a number.`)
-      return
+      if (match.number === newNumber)
+      {
+        alert(`Contact already exists`);
+        return
+      }
+
+      if (window.confirm(`${newName} is already added to the phonebook, replace the old number with a new one`)) {
+        console.log("running");
+  
+        personService
+          .update(match.id,{...match,number:newNumber})
+          .then(updatedPerson => {
+            // update view
+            setPersons(persons.map(person =>
+              person.id!==match.id ? person : updatedPerson))
+
+          })
+          .catch(error => {
+            console.log("Error updating new number!");
+          })
+      }
+    }
+    else {
+
+      // create new contact
+      const personObj = {name: newName, number: newNumber}
+
+      personService
+        .create(personObj)
+        .then(returnedPersonObj => {
+          // update state value
+          setPersons(persons.concat(returnedPersonObj))
+        })
+        .catch(error => {
+          alert(`Failed to add ${newName} to server`)
+        })
     }
 
-    // create new contact
-    const personObj = {name: newName, number: newNumber}
-
-    personService
-      .create(personObj)
-      .then(returnedPersonObj => {
-        // update state value
-        setPersons(persons.concat(returnedPersonObj))
-
-        // reset form values
-        setNewName('')
-        setNewNumber('')
-      })
-      .catch(error => {
-        alert(`Failed to add ${newName} to server`)
-      })
+    // reset form values
+    setNewName('')
+    setNewNumber('')
   }
 
   const handleDeleteContact = (id) => {
