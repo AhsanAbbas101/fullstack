@@ -161,6 +161,9 @@ const App = () => {
   }
 
   const handleDeleteContact = (id) => {
+    
+    const match = persons.find(person => person.id === id)
+    
     personService
       .remove(id)
       .then(respose => {
@@ -168,11 +171,11 @@ const App = () => {
         
         setPersons(persons.filter(person => person.id !== id))
 
-        const match = persons.find(person => person.id === id)
+
         enableNotification(true, `${match.name} deleted successfully.` )
       })
       .catch(error => {
-        enableNotification(false,`Failed to delete ${newName} from server`)
+        enableNotification(false,`Failed to delete ${match.name} from server`)
       })
 
   }
