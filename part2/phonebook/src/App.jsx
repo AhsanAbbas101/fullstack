@@ -29,9 +29,11 @@ const PersonForm = (props) => {
 
 const DisplayContact = ({person, onDeleteClick}) => {
   
+  const divstyleobj = { display: 'flex', alignItems: 'center'}
+  const pstyleobj = { marginRight: 10}
   return(
-    <>
-      <p>{person.name} {person.number}</p>
+    <div style={divstyleobj}>
+      <p style={pstyleobj}>{person.name} {person.number}</p>
       <button onClick={() => {
           if (window.confirm(`Delete ${person.name}?`)) {
             onDeleteClick(person.id);
@@ -39,7 +41,7 @@ const DisplayContact = ({person, onDeleteClick}) => {
         } }>
         delete
       </button>  
-    </>
+    </div>
   
   
   )
@@ -103,34 +105,37 @@ const App = () => {
   const handleNewContact = (event) => {
     event.preventDefault()
 
-    if (newNumber === '' || newName === '')
+    const nameInput = newName.trim()
+    const numberInput = newNumber.trim()
+
+    if (numberInput === '' || nameInput === '')
     {
       enableNotification(false,'Please enter value.')
       return
     }
 
     const match = persons.find((person) => 
-                                person.name.toLowerCase() === newName.toLowerCase())
+                                person.name.toLowerCase() === nameInput.toLowerCase())
 
     if (match !== undefined)
     {
-      if (match.number === newNumber)
+      if (match.number === numberInput)
       {
         enableNotification(false,'Contact already exists.')
         return
       }
 
-      if (window.confirm(`${newName} is already added to the phonebook, replace the old number with a new one`)) {
+      if (window.confirm(`${nameInput} is already added to the phonebook, replace the old number with a new one`)) {
         console.log("running");
   
         personService
-          .update(match.id,{...match,number:newNumber})
+          .update(match.id,{...match,number:numberInput})
           .then(updatedPerson => {
             // update view
             setPersons(persons.map(person =>
               person.id!==match.id ? person : updatedPerson))
 
-            enableNotification(true, `${newName} updated successfully.` )
+            enableNotification(true, `${nameInput} updated successfully.` )
           })
           .catch(error => {
             enableNotification(false,'Error updating new number.')
@@ -140,7 +145,7 @@ const App = () => {
     else {
 
       // create new contact
-      const personObj = {name: newName, number: newNumber}
+      const personObj = {name: nameInput, number: numberInput}
 
       personService
         .create(personObj)
@@ -148,10 +153,10 @@ const App = () => {
           // update state value
           setPersons(persons.concat(returnedPersonObj))
 
-          enableNotification(true, `${newName} added successfully.` )
+          enableNotification(true, `${nameInput} added successfully.` )
         })
         .catch(error => {
-          enableNotification(false,`Failed to add ${newName} to server`)
+          enableNotification(false,`Failed to add ${nameInput} to server`)
         })
     }
 
@@ -170,7 +175,6 @@ const App = () => {
         console.log(`deletion performed on id ${id}`);
         
         setPersons(persons.filter(person => person.id !== id))
-
 
         enableNotification(true, `${match.name} deleted successfully.` )
       })
