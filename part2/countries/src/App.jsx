@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import axios from "axios"
 
+//($env:VITE_WEATHER_API_KEY="") -and (npm run dev)
+const WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY
+
 const Filter = ({keyword, onInput}) => {
   return (
     <div>
@@ -61,8 +64,38 @@ const ListView = ({countries, onSelection}) => {
   )
 }
 
+const WeatherView = ({city}) => {
+
+  const [weather, setWeather] = useState(null)
+
+
+  useEffect(()=>{
+
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${WEATHER_API_KEY}&units=metric`
+    axios
+      .get(encodeURI(url))
+      .then(response=> setWeather(response.data))
+      .catch(error => console.log(`Failed to retrieved weather data for ${city}`))
+  },[])
+
+  if (!weather)
+    return null
+
+  return (
+    <div>
+      <h3>Weather in {city}</h3>
+      <p>Temperature {weather.main.temp} Celcius</p>
+      <p>Feels like {weather.main.feels_like} Celcius</p>
+      <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}></img>
+      <p>wind {weather.wind.speed} m/s</p>
+    </div>
+  )
+
+}
+
 // SimpleView component displays details of a country
 const SimpleView = ({country}) => {
+
   return (
     <div>
       <h2>{country.name.common}</h2>
@@ -73,6 +106,7 @@ const SimpleView = ({country}) => {
       <ul>{  Object.entries(country.languages).map(([key, value],i) => <li key={key}>{value}</li>) } </ul>
       <br></br>
       <img src={country.flags.png} alt={country.flags.alt}></img>
+      <WeatherView city={country.capital} />
     </div>
   )
 }
