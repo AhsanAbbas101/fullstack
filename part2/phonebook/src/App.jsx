@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
-//import axios from 'axios'
 import personService from './services/persons'
-import axios from 'axios'
 
+import './styles/notification.css'
 
 const Filter = ({keyword, onInput}) => {
   return (
@@ -35,7 +34,6 @@ const DisplayContact = ({person, onDeleteClick}) => {
       <p>{person.name} {person.number}</p>
       <button onClick={() => {
           if (window.confirm(`Delete ${person.name}?`)) {
-            console.log("running");
             onDeleteClick(person.id);
           }
         } }>
@@ -53,21 +51,51 @@ const Persons = ({persons, onDeleteClick}) => {
   )
 }
 
+const Notification = ({notification}) => {
+
+  if (notification === null) {
+    return null
+  }
+
+  const {positive, msg} = notification
+  const msgstyle = {color: positive ? 'green': 'red'}
+  return (
+    <div className='error' style={msgstyle}> {msg} </div>
+  )
+}
+
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterInput, setFilterInput] = useState('')
+  const [noificationMsg, setNoificationMsg] = useState(null)
+
+
+  const disableNotification = (delay) => {
+    setTimeout(() => {
+      setNoificationMsg(null)
+    }, delay)
+  }
+  const enableNotification = (positive, msg, delay=5000) => {
+    
+    setNoificationMsg({
+      positive:positive,
+      msg:msg
+    })
+    disableNotification(delay)     
+  }
 
   useEffect(() => {
+    // get all numbers from json-server 
     personService
       .getAll()
       .then(allContacts => {
         setPersons(allContacts)
       })
       .catch(respose => {
-        alert('Failed to retrieve data from server')
+        enableNotification(false,'Failed to retrieve data from server')
       })
   },[])
 
@@ -77,7 +105,7 @@ const App = () => {
 
     if (newNumber === '' || newName === '')
     {
-      alert(`Please enter value.`)
+      enableNotification(false,'Please enter value.')
       return
     }
 
@@ -88,7 +116,7 @@ const App = () => {
     {
       if (match.number === newNumber)
       {
-        alert(`Contact already exists`);
+        enableNotification(false,'Contact already exists.')
         return
       }
 
@@ -102,9 +130,10 @@ const App = () => {
             setPersons(persons.map(person =>
               person.id!==match.id ? person : updatedPerson))
 
+            enableNotification(true, `${newName} updated successfully.` )
           })
           .catch(error => {
-            console.log("Error updating new number!");
+            enableNotification(false,'Error updating new number.')
           })
       }
     }
@@ -118,9 +147,11 @@ const App = () => {
         .then(returnedPersonObj => {
           // update state value
           setPersons(persons.concat(returnedPersonObj))
+
+          enableNotification(true, `${newName} added successfully.` )
         })
         .catch(error => {
-          alert(`Failed to add ${newName} to server`)
+          enableNotification(false,`Failed to add ${newName} to server`)
         })
     }
 
@@ -136,9 +167,12 @@ const App = () => {
         console.log(`deletion performed on id ${id}`);
         
         setPersons(persons.filter(person => person.id !== id))
+
+        const match = persons.find(person => person.id === id)
+        enableNotification(true, `${match.name} deleted successfully.` )
       })
       .catch(error => {
-
+        enableNotification(false,`Failed to delete ${newName} from server`)
       })
 
   }
@@ -154,6 +188,8 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       
+      <Notification notification={noificationMsg}/>
+
       <Filter keyword={filterInput} onInput={setFilterInput}/>
 
       <h3>add a new</h3>
