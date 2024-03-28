@@ -17,17 +17,45 @@ const TextView = ({text}) => {
 }
 
 // ListView component lists the names of the country
-const ListView = ({countries}) => {
+const ListView = ({countries, onSelection}) => {
   const style = {
     listStyleType : "none",
-    margin: 0,
+    marginTop: 0,
     padding: 0
+  }
+
+  const handleShowOnClick = (country) => {
+    
+    // I was passing the whole country object and can set it directly for selection like
+    //onSelection(country);
+    //return
+    // but i'm not sure if accessing the api is required for evaluation.
+    // hence the following code accesses the api to get selected country.
+
+    const url = `https://studies.cs.helsinki.fi/restcountries/api/name/${country.name.common}`
+    axios
+      .get(encodeURI(url))
+      .then(response => response.data)
+      .then(data => onSelection(data)) 
+      .catch(error => console.log(`Error getting ${country.name.common}`))
+    
   }
 
   return (
     <div>
       <ul style={style}>
-        { countries.map(country => <li key={country.name.common}>{country.name.common}</li> )}
+        { countries.map(country => {
+          return (
+              <li key={country.name.common}>
+                <div style={{marginTop:5}}>
+                  {country.name.common}
+                  <button style={{marginLeft:6}} onClick={() => handleShowOnClick(country)}>show</button>
+                </div>
+              </li>
+
+
+          )
+        }  )}
       </ul>
     </div>
   )
@@ -52,6 +80,19 @@ const SimpleView = ({country}) => {
 // View component decides which view to use 
 const View = ({keyword, countries}) => {
 
+  const [selection, setSelection] = useState(null)
+
+  useEffect(() => {
+    if (selection)
+      setSelection(null)
+  }, [keyword])
+
+  // view the selected country
+  if (selection)
+  {
+    return ( <SimpleView country={selection}/>)
+  }
+
   if(countries.length === 0 || keyword.trim() === '')
     return null
 
@@ -70,7 +111,7 @@ const View = ({keyword, countries}) => {
   if (results.length === 1)
     return ( <SimpleView country={results[0]}/> )  
   
-  return (<ListView countries={results}/>)
+  return (<ListView countries={results} onSelection={setSelection}/>)
 }
 
 function App() {
