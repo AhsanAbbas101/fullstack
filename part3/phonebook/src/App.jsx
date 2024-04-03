@@ -138,7 +138,7 @@ const App = () => {
             enableNotification(true, `${nameInput} updated successfully.` )
           })
           .catch(error => {
-            enableNotification(false,'Error updating new number.')
+            enableNotification(false,'Error updating new number. | ' + error.response.data.error)
           })
       }
     }
@@ -156,7 +156,7 @@ const App = () => {
           enableNotification(true, `${nameInput} added successfully.` )
         })
         .catch(error => {
-          enableNotification(false,`Failed to add ${nameInput} to server`)
+          enableNotification(false,`Failed to add ${nameInput} to server | ` + error.response.data.error)
         })
     }
 

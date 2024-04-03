@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "server": "json-server -p3001 --watch db.json",
     "build:ui": "@powershell Remove-Item -Recurse -Force dist && npm run build && @powershell Copy-Item dist ../../../fullstack-nodejs -Recurse -Force",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
+    "deploy:full": "npm run build:ui && cd ../../../fullstack-nodejs && npm run deploy"
   },
   "dependencies": {
     "axios": "^1.6.8",
