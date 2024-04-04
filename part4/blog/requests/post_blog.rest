@@ -5,7 +5,7 @@ content-type: application/json
     "title": "My first blog",
     "author": "Dave",
     "url": "/blogs/0/1",
-    "likes": 0
+    "likes": 1
 }
 
 ###
