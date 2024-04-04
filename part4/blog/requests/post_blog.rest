@@ -1,0 +1,21 @@
+POST http://localhost:3001/api/blogs HTTP/1.1
+content-type: application/json
+
+{
+    "title": "My first blog",
+    "author": "Dave",
+    "url": "/blogs/0/1",
+    "likes": 0
+}
+
+###
+
+POST http://localhost:3001/api/blogs HTTP/1.1
+content-type: application/json
+
+{
+    "title": "My second blog",
+    "author": "Dave",
+    "url": "/blogs/0/2",
+    "likes": 0
+}
