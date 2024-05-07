@@ -15,15 +15,26 @@ blogsRouter.get('/', async (request, response) => {
     */
 })
 
-blogsRouter.post('/', (request, response, next) => {
+blogsRouter.post('/', async (request, response) => {
     const blog = new Blog(request.body)
+    blog.likes = blog.likes || 0
 
+    if (blog.title && blog.url)
+    {
+        const result = await blog.save()
+        response.status(201).json(result)
+    }
+
+    response.status(400).end()
+
+    /*
     blog
         .save()
         .then(result => {
             response.status(201).json(result)
         })
         .catch(error => next(error))
+    */
 })
 
 module.exports = blogsRouter
