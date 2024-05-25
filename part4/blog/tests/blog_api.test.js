@@ -120,8 +120,95 @@ describe('[POST] /api/blogs', () => {
     })
 })
 
+describe('[DELETE] /api/blogs', () => {
+    test('successfully delete a blog', async () => {
+        const blogsInDb = await helper.blogsInDb()
+        const blogToDelete = blogsInDb[0]
 
+        await api
+            .delete(`${base_url}/${blogToDelete.id}`)
+            .expect(204)
 
+        const blogsAtEnd = await helper.blogsInDb()
+
+        assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+
+        const titles = blogsAtEnd.map(blog => blog.title)
+        assert(!titles.includes(blogToDelete.title))
+    })
+
+    test('400 on invalid id', async () => {
+        const invalidId = 'invalidID'
+
+        await api
+            .delete(`${base_url}/${invalidId}`)
+            .expect(400)
+    })
+
+    test('404 on missing valid id', async () => {
+        const blogsInDb = await helper.blogsInDb()
+        const blogToDelete = blogsInDb[0]
+
+        await api
+            .delete(`${base_url}/${blogToDelete.id}`)
+            .expect(204)
+
+        await api
+            .delete(`${base_url}/${blogToDelete.id}`)
+            .expect(404)
+    })
+})
+
+describe('[PUT] /api/blogs', () => {
+
+    test('successfully update likes of blog', async () => {
+        const blogsInDb = await helper.blogsInDb()
+        const blogToUpdate = blogsInDb[0]
+
+        blogToUpdate.likes = blogToUpdate.likes + 10
+
+        const response = await api
+            .put(`${base_url}/${blogToUpdate.id}`)
+            .send(blogToUpdate)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+
+        const blogsInEnd = await helper.blogsInDb()
+
+        // assert in both response and db
+        assert.strictEqual(blogsInEnd[0].likes, blogToUpdate.likes)
+        assert.strictEqual(response.body.likes, blogToUpdate.likes)
+    })
+
+    test('400 on invalid id', async () => {
+        const blogsInDb = await helper.blogsInDb()
+        const blogToUpdate = blogsInDb[0]
+
+        blogToUpdate.likes = blogToUpdate.likes + 10
+        const invalidId = 'invalidID'
+
+        await api
+            .put(`${base_url}/${invalidId}`)
+            .send(blogToUpdate)
+            .expect(400)
+    })
+
+    test('404 on missing valid id', async () => {
+        const blogsInDb = await helper.blogsInDb()
+        const blogToUpdate = blogsInDb[0]
+
+        blogToUpdate.likes = blogToUpdate.likes + 10
+
+        await api
+            .delete(`${base_url}/${blogToUpdate.id}`)
+            .expect(204)
+
+        await api
+            .put(`${base_url}/${blogToUpdate.id}`)
+            .send(blogToUpdate)
+            .expect(404)
+    })
+})
 
 
 after( async () => {
