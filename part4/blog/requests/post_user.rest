@@ -6,3 +6,26 @@ content-type: application/json
     "name": "Superuser",
     "password": "salainen"
 }
+
+###
+
+GET http://localhost:3001/api/users
+
+###
+POST http://localhost:3001/api/users HTTP/1.1
+content-type: application/json
+
+{
+    "name": "dummy",
+    "password": "salainen"
+}
+
+###
+POST http://localhost:3001/api/users HTTP/1.1
+content-type: application/json
+
+{
+    "username": "d",
+    "name": "dummy",
+    "password": "sal"
+}
