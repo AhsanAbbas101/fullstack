@@ -2,7 +2,16 @@ const blogsRouter = require('express').Router()
 const { request } = require('../app')
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
+
+const getTokenFrom = request => {
+    const authorization = request.get('authorization')
+    if (authorization && authorization.startsWith('Bearer ')) {
+        return authorization.replace('Bearer ','')
+    }
+    return null
+}
 
 blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog
@@ -25,10 +34,16 @@ blogsRouter.post('/', async (request, response) => {
     const blog = new Blog(request.body)
     blog.likes = blog.likes || 0
 
+    const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+    if (!decodedToken.id) {
+        return response.status(401).json({ error: 'invalid token' })
+    }
+
     if (blog.title && blog.url)
     {
-        // assign random user as creater of blog
-        const user = await User.findOne()
+        // assign user as creater of blog
+        // const user = await User.findOne()
+        const user = await User.findById(decodedToken.id)
         blog.user = user._id
 
         const result = await blog.save()
@@ -40,7 +55,7 @@ blogsRouter.post('/', async (request, response) => {
         response.status(201).json(result)
     }
 
-    response.status(400).end()
+    response.status(400).json({ error: 'Missing blog title or url' })
 
     /*
     blog
