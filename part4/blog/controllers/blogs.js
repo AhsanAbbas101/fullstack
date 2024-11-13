@@ -2,7 +2,8 @@ const blogsRouter = require('express').Router()
 //const { request } = require('../app')
 const Blog = require('../models/blog')
 const User = require('../models/user')
-const jwt = require('jsonwebtoken')
+const { userExtractor } = require('../utils/middleware')
+//const jwt = require('jsonwebtoken')
 
 
 blogsRouter.get('/', async (request, response) => {
@@ -22,20 +23,21 @@ blogsRouter.get('/', async (request, response) => {
     */
 })
 
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', userExtractor ,async (request, response) => {
     const blog = new Blog(request.body)
     blog.likes = blog.likes || 0
 
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    if (!decodedToken.id) {
-        return response.status(401).json({ error: 'invalid token' })
-    }
+    // const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    // if (!decodedToken.id) {
+    //     return response.status(401).json({ error: 'invalid token' })
+    // }
 
     if (blog.title && blog.url)
     {
         // assign user as creater of blog
         // const user = await User.findOne()
-        const user = await User.findById(decodedToken.id)
+        // const user = await User.findById(decodedToken.id)
+        const user = request.user
         blog.user = user._id
 
         const result = await blog.save()
@@ -59,13 +61,13 @@ blogsRouter.post('/', async (request, response) => {
     */
 })
 
-blogsRouter.delete('/:id', async (request, response) => {
+blogsRouter.delete('/:id' , userExtractor, async (request, response) => {
 
     // verify token
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    if (!decodedToken.id) {
-        return response.status(401).json({ error: 'invalid token' })
-    }
+    // const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    // if (!decodedToken.id) {
+    //     return response.status(401).json({ error: 'invalid token' })
+    // }
 
     const blog = await Blog.findById(request.params.id)
     if (!blog)
@@ -74,7 +76,8 @@ blogsRouter.delete('/:id', async (request, response) => {
     }
 
     // check if the blog creator and token user are same
-    if (blog.user.toString() === decodedToken.id.toString())
+    // if (blog.user.toString() === decodedToken.id.toString())
+    if (blog.user.toString() === request.user.id.toString())
     {
         await Blog.findByIdAndDelete(request.params.id)
         return response.status(204).end()
