@@ -28,6 +28,8 @@ if (config.ENV !== 'test')
 {
     app.use(middleware.requestLogger)
 }
+app.use(middleware.tokenExtractor)
+
 
 // controllers
 app.use('/api/blogs', blogsRouter)
