@@ -1,12 +1,12 @@
 POST http://localhost:3001/api/blogs HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5ld1VzZXIiLCJpZCI6IjY3MzQ5MGI3Zjk1MTRjYTMyYTQ1NjE4YiIsImlhdCI6MTczMTUwMDg5NSwiZXhwIjoxNzMxNTA0NDk1fQ.PSjjcX4OHRU5ayzfsI4Fo4yK3MwycR6MBxJkKWYyLak
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5ld1VzZXIiLCJpZCI6IjY3MzQ5MGI3Zjk1MTRjYTMyYTQ1NjE4YiIsImlhdCI6MTczMTUwNTkxMCwiZXhwIjoxNzMxNTA5NTEwfQ.52XulE2P_BC8xjHfeXFVD-8JoHxUdpvd5Xbnfha7bUg
 
 {
-    "title": "My first blog",
+    "title": "My second blog",
     "author": "Dave",
-    "url": "/blogs/0/1",
-    "likes": 1
+    "url": "/blogs/0/2",
+    "likes": 0
 }
 
 ###

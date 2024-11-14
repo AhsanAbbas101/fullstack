@@ -43,8 +43,7 @@ blogsRouter.post('/', userExtractor ,async (request, response) => {
         const result = await blog.save()
 
         // assign blog id to user doc
-        const updatedUser = await User.findByIdAndUpdate(user._id, { blogs: user.blogs.concat([blog.id]) }, { new: true })
-        console.log(updatedUser)
+        await User.findByIdAndUpdate(user._id, { blogs: user.blogs.concat([blog.id]) }, { new: true })
 
         return response.status(201).json(result)
     }
@@ -89,19 +88,28 @@ blogsRouter.delete('/:id' , userExtractor, async (request, response) => {
 
 })
 
-blogsRouter.put('/:id', async (request, response) => {
+blogsRouter.put('/:id', userExtractor, async (request, response) => {
     const body = request.body
-
-    const blog = {
-        likes: body.likes
+    const blogToUpdate = {
+        likes: body.likes | 0 // change
     }
 
-    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
-    if (updatedBlog) {
-        return response.json(updatedBlog)
+    const blog = await Blog.findById(request.params.id)
+    if (!blog)
+    {
+        return response.status(404).json({ error: 'invalid blog id' })
     }
 
-    return response.status(404).end()
+    if (blog.user.toString() === request.user.id.toString())
+    {
+        const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blogToUpdate, { new: true })
+        return response.status(200).json(updatedBlog)
+    }
+    else
+    {
+        return response.status(401).json({ error: 'Updation on object not allowed.' })
+    }
+
 })
 
 module.exports = blogsRouter

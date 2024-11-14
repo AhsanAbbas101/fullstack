@@ -1,4 +1,4 @@
-const { describe, test, after, beforeEach } = require('node:test')
+const { describe, test, after, beforeEach, before } = require('node:test')
 const assert = require('node:assert')
 const supertest = require('supertest')
 const mongoose = require('mongoose')
@@ -8,6 +8,23 @@ const helper = require('../tests/test_helper')
 const api = supertest(app)
 
 const Blog = require('../models/blog')
+const User = require('../models/user')
+
+let TOKEN = null
+
+before(async () => {
+    await User.deleteMany({})
+    await User.insertMany(helper.initialUsers)
+
+    const res = await api
+        .post('/api/login')
+        .send({
+            username: 'newUser',
+            password: 'iamnewhere'
+        })
+
+    TOKEN = 'Bearer ' + res.body.token
+})
 
 beforeEach(async () => {
     await Blog.deleteMany({})
@@ -64,6 +81,7 @@ describe('[POST] /api/blogs', () => {
         }
 
         await api.post(base_url)
+            .set('Authorization', TOKEN)
             .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -82,7 +100,9 @@ describe('[POST] /api/blogs', () => {
             url: 'https://example.com',
         }
 
-        const response = await api.post(base_url)
+        const response = await api
+            .post(base_url)
+            .set('Authorization', TOKEN)
             .send(newBlog)
 
         assert.strictEqual(response.body.likes,0)
@@ -96,6 +116,7 @@ describe('[POST] /api/blogs', () => {
         }
 
         await api.post(base_url)
+            .set('Authorization', TOKEN)
             .send(newBlogwithNoTitle)
             .expect(400)
 
@@ -111,22 +132,80 @@ describe('[POST] /api/blogs', () => {
             likes: 5
         }
 
-        await api.post(base_url)
+        await api
+            .post(base_url)
+            .set('Authorization', TOKEN)
             .send(newBlogwithNoURL)
             .expect(400)
 
         const blogs = await helper.blogsInDb()
         assert.strictEqual(blogs.length, helper.initialBlogs.length)
     })
+
+    test('invalid token', async () => {
+        const newBlog = {
+            title: 'A new blog',
+            author: 'Jon Doe',
+            url: 'https://example.com',
+            likes: 5
+        }
+
+        await api
+            .post(base_url)
+            .set('Authorization', 'Bearer InvalidTokenPlaceHere')
+            .send(newBlog)
+            .expect(401)
+
+        const blogs = await helper.blogsInDb()
+        assert.strictEqual(blogs.length, helper.initialBlogs.length)
+    })
+
+    test('no token provided', async () => {
+        const newBlog = {
+            title: 'A new blog',
+            author: 'Jon Doe',
+            url: 'https://example.com',
+            likes: 5
+        }
+
+        await api
+            .post(base_url)
+            .send(newBlog)
+            .expect(401)
+
+        const blogs = await helper.blogsInDb()
+        assert.strictEqual(blogs.length, helper.initialBlogs.length)
+    })
+
+    test('token user shall be linked with post', async () => {
+        const newBlog = {
+            title: 'A new blog',
+            author: 'Jon Doe',
+            url: 'https://example.com',
+            likes: 5
+        }
+
+        const response = await api
+            .post(base_url)
+            .set('Authorization', TOKEN)
+            .send(newBlog)
+            .expect(201)
+
+        const blogs = await helper.blogsInDb()
+        assert.strictEqual(blogs.length, helper.initialBlogs.length + 1)
+
+        assert.strictEqual(response.body.user.toString(), helper.initialUsers[1]._id)
+    })
 })
 
 describe('[DELETE] /api/blogs', () => {
-    test('successfully delete a blog', async () => {
+    test('204 successfully delete a blog belonging to token user', async () => {
         const blogsInDb = await helper.blogsInDb()
-        const blogToDelete = blogsInDb[0]
+        const blogToDelete = blogsInDb[3]
 
         await api
             .delete(`${base_url}/${blogToDelete.id}`)
+            .set('Authorization', TOKEN)
             .expect(204)
 
         const blogsAtEnd = await helper.blogsInDb()
@@ -137,38 +216,86 @@ describe('[DELETE] /api/blogs', () => {
         assert(!titles.includes(blogToDelete.title))
     })
 
-    test('400 on invalid id', async () => {
-        const invalidId = 'invalidID'
-
-        await api
-            .delete(`${base_url}/${invalidId}`)
-            .expect(400)
-    })
-
-    test('404 on missing valid id', async () => {
+    test('401 unauthorized on deleting a blog not belonging to token user', async () => {
         const blogsInDb = await helper.blogsInDb()
         const blogToDelete = blogsInDb[0]
 
         await api
             .delete(`${base_url}/${blogToDelete.id}`)
+            .set('Authorization', TOKEN)
+            .expect(401)
+
+        const blogsAtEnd = await helper.blogsInDb()
+        assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+
+        const titles = blogsAtEnd.map(blog => blog.title)
+        assert(titles.includes(blogToDelete.title))
+    })
+
+    test('400 on invalid id', async () => {
+        const invalidId = 'invalidID'
+
+        await api
+            .delete(`${base_url}/${invalidId}`)
+            .set('Authorization', TOKEN)
+            .expect(400)
+
+        const blogs = await helper.blogsInDb()
+        assert.strictEqual(blogs.length, helper.initialBlogs.length)
+    })
+
+    test('404 on missing valid id', async () => {
+        const blogsInDb = await helper.blogsInDb()
+        const blogToDelete = blogsInDb[3]
+
+        await api
+            .delete(`${base_url}/${blogToDelete.id}`)
+            .set('Authorization', TOKEN)
             .expect(204)
 
         await api
             .delete(`${base_url}/${blogToDelete.id}`)
+            .set('Authorization', TOKEN)
             .expect(404)
+    })
+
+    test('401 invalid token', async () => {
+        const blogsInDb = await helper.blogsInDb()
+        const blogToDelete = blogsInDb[3]
+
+        await api
+            .delete(`${base_url}/${blogToDelete.id}`)
+            .set('Authorization', 'Bearer InvalidTokenPlaceHere')
+            .expect(401)
+
+        const blogs = await helper.blogsInDb()
+        assert.strictEqual(blogs.length, helper.initialBlogs.length)
+    })
+
+    test('401 missing token', async () => {
+        const blogsInDb = await helper.blogsInDb()
+        const blogToDelete = blogsInDb[3]
+
+        await api
+            .delete(`${base_url}/${blogToDelete.id}`)
+            .expect(401)
+
+        const blogs = await helper.blogsInDb()
+        assert.strictEqual(blogs.length, helper.initialBlogs.length)
     })
 })
 
 describe('[PUT] /api/blogs', () => {
 
-    test('successfully update likes of blog', async () => {
+    test('200 successfully update likes of blog', async () => {
         const blogsInDb = await helper.blogsInDb()
-        const blogToUpdate = blogsInDb[0]
+        const blogToUpdate = blogsInDb[3]
 
         blogToUpdate.likes = blogToUpdate.likes + 10
 
         const response = await api
             .put(`${base_url}/${blogToUpdate.id}`)
+            .set('Authorization', TOKEN)
             .send(blogToUpdate)
             .expect(200)
             .expect('Content-Type', /application\/json/)
@@ -176,37 +303,91 @@ describe('[PUT] /api/blogs', () => {
         const blogsInEnd = await helper.blogsInDb()
 
         // assert in both response and db
-        assert.strictEqual(blogsInEnd[0].likes, blogToUpdate.likes)
+        assert.strictEqual(blogsInEnd[3].likes, blogToUpdate.likes)
         assert.strictEqual(response.body.likes, blogToUpdate.likes)
+    })
+
+    test('401 unathorized update of blog not belonging to token user', async () => {
+        const blogsInDb = await helper.blogsInDb()
+        const blogToUpdate = blogsInDb[0]
+
+        blogToUpdate.likes = blogToUpdate.likes + 10
+
+        await api
+            .put(`${base_url}/${blogToUpdate.id}`)
+            .set('Authorization', TOKEN)
+            .send(blogToUpdate)
+            .expect(401)
+            .expect('Content-Type', /application\/json/)
+
+        const blogsInEnd = await helper.blogsInDb()
+        assert.notStrictEqual(blogsInEnd[0].likes, blogToUpdate.likes)
+
     })
 
     test('400 on invalid id', async () => {
         const blogsInDb = await helper.blogsInDb()
-        const blogToUpdate = blogsInDb[0]
+        const blogToUpdate = blogsInDb[3]
 
         blogToUpdate.likes = blogToUpdate.likes + 10
         const invalidId = 'invalidID'
 
         await api
             .put(`${base_url}/${invalidId}`)
+            .set('Authorization', TOKEN)
             .send(blogToUpdate)
             .expect(400)
+
+        const blogsInEnd = await helper.blogsInDb()
+        assert.notStrictEqual(blogsInEnd[3].likes, blogToUpdate.likes)
     })
 
     test('404 on missing valid id', async () => {
         const blogsInDb = await helper.blogsInDb()
-        const blogToUpdate = blogsInDb[0]
+        const blogToUpdate = blogsInDb[3]
 
         blogToUpdate.likes = blogToUpdate.likes + 10
 
         await api
             .delete(`${base_url}/${blogToUpdate.id}`)
+            .set('Authorization', TOKEN)
             .expect(204)
 
         await api
             .put(`${base_url}/${blogToUpdate.id}`)
+            .set('Authorization', TOKEN)
             .send(blogToUpdate)
             .expect(404)
+
+        const blogsInEnd = await helper.blogsInDb()
+        assert.notStrictEqual(blogsInEnd[3].likes, blogToUpdate.likes)
+    })
+
+    test('401 invalid token', async () => {
+        const blogsInDb = await helper.blogsInDb()
+        const blogToUpdate = blogsInDb[3]
+        blogToUpdate.likes = blogToUpdate.likes + 10
+
+        await api
+            .delete(`${base_url}/${blogToUpdate.id}`)
+            .set('Authorization', 'Bearer InvalidTokenPlaceHere')
+            .expect(401)
+
+        const blogsInEnd = await helper.blogsInDb()
+        assert.notStrictEqual(blogsInEnd[3].likes, blogToUpdate.likes)
+    })
+
+    test('401 missing token', async () => {
+        const blogsInDb = await helper.blogsInDb()
+        const blogToUpdate = blogsInDb[3]
+        blogToUpdate.likes = blogToUpdate.likes + 10
+
+        await api
+            .delete(`${base_url}/${blogToUpdate.id}`)
+            .expect(401)
+
+        const blogsInEnd = await helper.blogsInDb()
+        assert.notStrictEqual(blogsInEnd[3].likes, blogToUpdate.likes)
     })
 })
 
