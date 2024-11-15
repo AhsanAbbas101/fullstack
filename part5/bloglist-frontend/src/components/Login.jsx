@@ -1,34 +1,22 @@
 import { useState, useEffect } from 'react'
-import loginService from '../services/login'
+
 
 /*
 * Login component 
 * 
 */
-const Login = (props) => {
+const Login = ({loginUser}) => {
 
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
-    const onLogin = async (event) => {
+    const onLogin = (event) => {
         event.preventDefault()
-    
-        try {
-            const user = await loginService.login({username,password})
-            user.token = loginService.setToken(user.token)
+        loginUser(username,password)
 
-            window.localStorage.setItem(
-                'loggedAppUser', JSON.stringify(user)
-            ) 
-
-            props.setUser(user)
-            setUsername('')
-            setPassword('')
-        } 
-        catch (exception) {
-            props.handleError('Invalid username or password')
-        }
-      }
+        setUsername('')
+        setPassword('')
+    }
 
     return (
 
