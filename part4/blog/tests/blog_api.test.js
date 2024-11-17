@@ -307,6 +307,7 @@ describe('[PUT] /api/blogs', () => {
         assert.strictEqual(response.body.likes, blogToUpdate.likes)
     })
 
+    /* not required
     test('401 unathorized update of blog not belonging to token user', async () => {
         const blogsInDb = await helper.blogsInDb()
         const blogToUpdate = blogsInDb[0]
@@ -324,6 +325,7 @@ describe('[PUT] /api/blogs', () => {
         assert.notStrictEqual(blogsInEnd[0].likes, blogToUpdate.likes)
 
     })
+    */
 
     test('400 on invalid id', async () => {
         const blogsInDb = await helper.blogsInDb()

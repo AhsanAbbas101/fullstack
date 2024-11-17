@@ -40,7 +40,7 @@ blogsRouter.post('/', userExtractor ,async (request, response) => {
         const user = request.user
         blog.user = user._id
 
-        const result = await blog.save()
+        const result = await blog.save().then(t => t.populate('user',{ username:1, name:1 })).then(t => t)
 
         // assign blog id to user doc
         await User.findByIdAndUpdate(user._id, { blogs: user.blogs.concat([blog.id]) }, { new: true })
@@ -100,15 +100,9 @@ blogsRouter.put('/:id', userExtractor, async (request, response) => {
         return response.status(404).json({ error: 'invalid blog id' })
     }
 
-    if (blog.user.toString() === request.user.id.toString())
-    {
-        const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blogToUpdate, { new: true })
-        return response.status(200).json(updatedBlog)
-    }
-    else
-    {
-        return response.status(401).json({ error: 'Updation on object not allowed.' })
-    }
+    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blogToUpdate, { new: true }).populate('user',{ username:1, name:1 })
+    return response.status(200).json(updatedBlog)
+
 
 })
 
