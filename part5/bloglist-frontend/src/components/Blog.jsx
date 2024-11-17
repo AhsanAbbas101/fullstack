@@ -25,7 +25,7 @@ export const Blog = ({ blog, onLikeClick, onRemoveClick, loggedUsername }) => {
     }
 
     return (
-        <div style={blogStyle}>
+        <div style={blogStyle} className='blog'>
             {blog.title} {blog.author}
             <button onClick={toggleVisibility}>{ !isDetailed ? 'view' : 'hide' }</button>
 
@@ -66,7 +66,7 @@ export const BlogForm = ({ createBlog }) => {
     }
 
     return (
-        <form onSubmit={OnCreate}>
+        <form onSubmit={OnCreate} className='blogForm'>
             <div>
       title
                 <input
@@ -74,6 +74,7 @@ export const BlogForm = ({ createBlog }) => {
                     value={title}
                     name="Title"
                     onChange={({ target }) => setTitle(target.value)}
+                    placeholder='write blog title'
                 />
             </div>
             <div>
@@ -83,6 +84,7 @@ export const BlogForm = ({ createBlog }) => {
                     value={author}
                     name="Author"
                     onChange={({ target }) => setAuthor(target.value)}
+                    placeholder='write blog author'
                 />
             </div>
             <div>
@@ -92,6 +94,7 @@ export const BlogForm = ({ createBlog }) => {
                     value={url}
                     name="URL"
                     onChange={({ target }) => setURL(target.value)}
+                    placeholder='write blog url'
                 />
             </div>
             <button type='submit'>create</button>
