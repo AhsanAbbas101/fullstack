@@ -25,7 +25,7 @@ export const Blog = ({ blog, onLikeClick, onRemoveClick, loggedUsername }) => {
     }
 
     return (
-        <div style={blogStyle} className='blog'>
+        <div style={blogStyle} className='blog' data-testid={blog.id}>
             {blog.title} {blog.author}
             <button onClick={toggleVisibility}>{ !isDetailed ? 'view' : 'hide' }</button>
 

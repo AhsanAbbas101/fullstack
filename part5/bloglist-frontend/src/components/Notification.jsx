@@ -18,7 +18,7 @@ Notification.propTypes = {
     notification: PropTypes.exact({
         positive: PropTypes.bool,
         msg: PropTypes.string
-    }).isRequired
+    })
 }
 
 export default Notification
