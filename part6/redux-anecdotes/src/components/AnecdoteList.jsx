@@ -17,7 +17,12 @@ const Anecdote = ({ anecdote, voteCallback }) => {
 
 
 const AnecdoteList = () => {
-    const anecdotes = useSelector(state => state)
+    const anecdotes = useSelector(state => {
+        if (state.filter === '')
+            return state.anecdotes
+
+        return state.anecdotes.filter(a => a.content.toLowerCase().includes(state.filter))
+    })
     const dispatch = useDispatch()
   
     const vote = (id) => {
