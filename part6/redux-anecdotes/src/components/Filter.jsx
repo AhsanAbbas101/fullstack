@@ -1,4 +1,5 @@
-import { filterAnecdote } from "../reducers/filterReducer"
+//import { filterAnecdote } from "../reducers/filterReducer"
+import { filterAnecdote } from "../reducers-toolkit/filterReducer"
 
 import { useDispatch } from "react-redux"
 
