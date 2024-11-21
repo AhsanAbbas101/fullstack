@@ -1,7 +1,9 @@
 import { useSelector, useDispatch } from "react-redux"
 //import { voteAnecdote } from '../reducers/anecdoteReducer'
-import { voteAnecdote } from '../reducers-toolkit/anecdoteReducer'
-import { setNotification, removeNotification } from '../reducers-toolkit/notificationReducer'
+import { voteAnAnecdote } from '../reducers-toolkit/anecdoteReducer'
+import { setNotification } from '../reducers-toolkit/notificationReducer'
+
+import PropTypes  from 'prop-types'
 
 const Anecdote = ({ anecdote, voteCallback }) => {
     return (
@@ -17,6 +19,15 @@ const Anecdote = ({ anecdote, voteCallback }) => {
     )
 }
 
+Anecdote.propTypes = {
+    anecdote: PropTypes.exact({
+        id: PropTypes.string,
+        content: PropTypes.string,
+        votes: PropTypes.number
+    }),
+    voteCallback: PropTypes.func
+}
+
 
 const AnecdoteList = () => {
     const anecdotes = useSelector(state => {
@@ -29,12 +40,10 @@ const AnecdoteList = () => {
   
     const vote = (anecdote) => {
       console.log('vote', anecdote.id)
-      dispatch(voteAnecdote(anecdote.id))
-    
-      dispatch(setNotification({
-        msg:`you voted '${anecdote.content}'`,
-        timeoutID: setTimeout(() => {dispatch(removeNotification())},5000)
-        }))
+      //dispatch(voteAnecdote(anecdote.id))
+      dispatch(voteAnAnecdote(anecdote))
+      
+      dispatch(setNotification(`you voted '${anecdote.content}'`,5))
     }
      
     return (
