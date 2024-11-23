@@ -1,0 +1,104 @@
+{
+  "anecdotes": [
+    {
+      "content": "If it hurts, do it more often",
+      "id": "47145",
+      "votes": 5
+    },
+    {
+      "content": "Adding manpower to a late software project makes it later!",
+      "id": "21149",
+      "votes": 2
+    },
+    {
+      "content": "The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.",
+      "id": "69581",
+      "votes": 2
+    },
+    {
+      "content": "Any fool can write code that a computer can understand. Good programmers write code that humans can understand.",
+      "id": "36975",
+      "votes": 0
+    },
+    {
+      "content": "Premature optimization is the root of all evil.",
+      "id": "25170",
+      "votes": 0
+    },
+    {
+      "content": "Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.",
+      "id": "98312",
+      "votes": 0
+    },
+    {
+      "content": "You shall not pass!",
+      "votes": 0,
+      "id": "hRtmDmm"
+    },
+    {
+      "content": "You shall not pass!",
+      "votes": 0,
+      "id": "lVR9kVq"
+    },
+    {
+      "content": "My precious!",
+      "votes": 1,
+      "id": "eoHJ7Jb"
+    },
+    {
+      "content": "This is new!",
+      "votes": 5,
+      "id": "jdlFJHZ"
+    },
+    {
+      "content": "Doctor",
+      "votes": 3,
+      "id": "3N7vswf"
+    },
+    {
+      "content": "Check this out!",
+      "votes": 3,
+      "id": "wj_aD_V"
+    },
+    {
+      "content": "But war never changes!",
+      "votes": 5,
+      "id": "dVmlXqC"
+    },
+    {
+      "content": "It Works!",
+      "votes": 5,
+      "id": "QsfbvSc"
+    },
+    {
+      "content": "Testing anecdote notification",
+      "votes": 0,
+      "id": "DFnSyS8"
+    },
+    {
+      "content": "check if it works",
+      "votes": 0,
+      "id": "fB_w3LO"
+    },
+    {
+      "content": "You shall not pass!",
+      "votes": 0,
+      "id": "HKB9pvD"
+    },
+    {
+      "content": "Hahah",
+      "votes": 1,
+      "id": "cpsaK9R"
+    },
+    {
+      "content": "created new",
+      "votes": 0,
+      "id": "kK_xzku"
+    },
+    {
+      "content": "Why is this happening",
+      "votes": 0,
+      "id": "i02Gb94"
+    }
+  ]
+}
