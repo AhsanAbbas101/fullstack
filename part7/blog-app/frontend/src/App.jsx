@@ -18,13 +18,15 @@ import {
     voteBlog,
     deleteBlog,
 } from './reducers/blogReducer'
+import { setUser } from './reducers/userReducer'
 
 const App = () => {
     const dispatch = useDispatch()
 
     //const [blogs, setBlogs] = useState([])
     const blogs = useSelector((state) => state.blogs)
-    const [user, setUser] = useState(null)
+    const user = useSelector((state) => state.user)
+    // const [_, setUser] = useState(null)
     //const [notification, setNotification] = useState(null)
 
     useEffect(() => {
@@ -35,7 +37,7 @@ const App = () => {
     useEffect(() => {
         const user = storage.loadUser()
         if (user) {
-            setUser(user)
+            dispatch(setUser(user))
         }
     }, [])
 
@@ -52,7 +54,7 @@ const App = () => {
     const handleLogin = async (credentials) => {
         try {
             const user = await loginService.login(credentials)
-            setUser(user)
+            dispatch(setUser(user))
             storage.saveUser(user)
             notify(`Welcome back, ${user.name}`)
         } catch (error) {
@@ -80,7 +82,7 @@ const App = () => {
     }
 
     const handleLogout = () => {
-        setUser(null)
+        dispatch(setUser(null))
         storage.removeUser()
         notify(`Bye, ${user.name}!`)
     }
