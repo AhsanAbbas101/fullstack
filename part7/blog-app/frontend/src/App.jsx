@@ -24,7 +24,7 @@ const App = () => {
         retry: 1,
         refetchOnWindowFocus: false,
     })
-    //const [blogs, setBlogs] = useState([])
+
     const queryClient = useQueryClient()
     const newBlogMutation = useMutation({
         mutationFn: blogService.create,
@@ -59,20 +59,14 @@ const App = () => {
             notify(`Blog ${blog.title}, by ${blog.author} removed`)
         },
     })
+
     const [user, userDispatch] = useContext(UserContext)
-    // const [user, setUser] = useState(null)
-
     const [notification, notificationDispatch] = useContext(NotificationContext)
-    // const [notification, setNotification] = useState(null)
-
-    // useEffect(() => {
-    //     blogService.getAll().then((blogs) => setBlogs(blogs))
-    // }, [])
 
     useEffect(() => {
         const user = storage.loadUser()
         if (user) {
-            userDispatch(setUser(user)) // setUser(user)
+            userDispatch(setUser(user))
         }
     }, [])
 
@@ -93,7 +87,7 @@ const App = () => {
     const handleLogin = async (credentials) => {
         try {
             const user = await loginService.login(credentials)
-            userDispatch(setUser(user)) // setUser(user)
+            userDispatch(setUser(user))
             storage.saveUser(user)
             notify(`Welcome back, ${user.name}`)
         } catch (error) {
@@ -102,26 +96,17 @@ const App = () => {
     }
 
     const handleCreate = async (blog) => {
-        //const newBlog = await blogService.create(blog)
-        //setBlogs(blogs.concat(newBlog))
         newBlogMutation.mutate(blog)
-        //notify(`Blog created: ${newBlog.title}, ${newBlog.author}`)
         blogFormRef.current.toggleVisibility()
     }
 
     const handleVote = async (blog) => {
         console.log('updating', blog)
-        // const updatedBlog = await blogService.update(blog.id, {
-        //     ...blog,
-        //     likes: blog.likes + 1,
-        // })
         voteBlogMutation.mutate({ ...blog, likes: blog.likes + 1 })
-        // notify(`You liked ${updatedBlog.title} by ${updatedBlog.author}`)
-        // setBlogs(blogs.map((b) => (b.id === blog.id ? updatedBlog : b)))
     }
 
     const handleLogout = () => {
-        userDispatch(removeUser()) // setUser(null)
+        userDispatch(removeUser())
         storage.removeUser()
         notify(`Bye, ${user.name}!`)
     }
@@ -129,9 +114,6 @@ const App = () => {
     const handleDelete = async (blog) => {
         if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
             deleteBlogMutation.mutate(blog)
-            // await blogService.remove(blog.id)
-            // setBlogs(blogs.filter((b) => b.id !== blog.id))
-            // notify(`Blog ${blog.title}, by ${blog.author} removed`)
         }
     }
 
