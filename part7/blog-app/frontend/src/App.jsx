@@ -15,18 +15,59 @@ import NotificationContext, {
 } from './contexts/notificationContext'
 import UserContext, { setUser, removeUser } from './contexts/userContext'
 
-const App = () => {
-    const [blogs, setBlogs] = useState([])
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
+const App = () => {
+    const { status, data, error } = useQuery({
+        queryKey: ['blogs'],
+        queryFn: blogService.getAll,
+        retry: 1,
+        refetchOnWindowFocus: false,
+    })
+    //const [blogs, setBlogs] = useState([])
+    const queryClient = useQueryClient()
+    const newBlogMutation = useMutation({
+        mutationFn: blogService.create,
+        onSuccess: (newBlog) => {
+            const blogs = queryClient.getQueryData(['blogs'])
+            queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
+            notify(`Blog created: ${newBlog.title}, ${newBlog.author}`)
+        },
+        onError: () => {
+            notify('Failed to create new blog', 'error')
+        },
+    })
+    const voteBlogMutation = useMutation({
+        mutationFn: (blog) => blogService.update(blog.id, blog),
+        onSuccess: (updatedBlog) => {
+            const blogs = queryClient.getQueryData(['blogs'])
+            queryClient.setQueryData(
+                ['blogs'],
+                blogs.map((b) => (b.id === updatedBlog.id ? updatedBlog : b))
+            )
+            notify(`You liked ${updatedBlog.title} by ${updatedBlog.author}`)
+        },
+    })
+    const deleteBlogMutation = useMutation({
+        mutationFn: (blog) => blogService.remove(blog.id),
+        onSuccess: (data, blog) => {
+            const blogs = queryClient.getQueryData(['blogs'])
+            queryClient.setQueryData(
+                ['blogs'],
+                blogs.filter((b) => b.id !== blog.id)
+            )
+            notify(`Blog ${blog.title}, by ${blog.author} removed`)
+        },
+    })
     const [user, userDispatch] = useContext(UserContext)
     // const [user, setUser] = useState(null)
 
     const [notification, notificationDispatch] = useContext(NotificationContext)
     // const [notification, setNotification] = useState(null)
 
-    useEffect(() => {
-        blogService.getAll().then((blogs) => setBlogs(blogs))
-    }, [])
+    // useEffect(() => {
+    //     blogService.getAll().then((blogs) => setBlogs(blogs))
+    // }, [])
 
     useEffect(() => {
         const user = storage.loadUser()
@@ -61,21 +102,22 @@ const App = () => {
     }
 
     const handleCreate = async (blog) => {
-        const newBlog = await blogService.create(blog)
-        setBlogs(blogs.concat(newBlog))
-        notify(`Blog created: ${newBlog.title}, ${newBlog.author}`)
+        //const newBlog = await blogService.create(blog)
+        //setBlogs(blogs.concat(newBlog))
+        newBlogMutation.mutate(blog)
+        //notify(`Blog created: ${newBlog.title}, ${newBlog.author}`)
         blogFormRef.current.toggleVisibility()
     }
 
     const handleVote = async (blog) => {
         console.log('updating', blog)
-        const updatedBlog = await blogService.update(blog.id, {
-            ...blog,
-            likes: blog.likes + 1,
-        })
-
-        notify(`You liked ${updatedBlog.title} by ${updatedBlog.author}`)
-        setBlogs(blogs.map((b) => (b.id === blog.id ? updatedBlog : b)))
+        // const updatedBlog = await blogService.update(blog.id, {
+        //     ...blog,
+        //     likes: blog.likes + 1,
+        // })
+        voteBlogMutation.mutate({ ...blog, likes: blog.likes + 1 })
+        // notify(`You liked ${updatedBlog.title} by ${updatedBlog.author}`)
+        // setBlogs(blogs.map((b) => (b.id === blog.id ? updatedBlog : b)))
     }
 
     const handleLogout = () => {
@@ -86,9 +128,10 @@ const App = () => {
 
     const handleDelete = async (blog) => {
         if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-            await blogService.remove(blog.id)
-            setBlogs(blogs.filter((b) => b.id !== blog.id))
-            notify(`Blog ${blog.title}, by ${blog.author} removed`)
+            deleteBlogMutation.mutate(blog)
+            // await blogService.remove(blog.id)
+            // setBlogs(blogs.filter((b) => b.id !== blog.id))
+            // notify(`Blog ${blog.title}, by ${blog.author} removed`)
         }
     }
 
@@ -117,14 +160,20 @@ const App = () => {
                 ref={blogFormRef}>
                 <NewBlog doCreate={handleCreate} />
             </Togglable>
-            {blogs.sort(byLikes).map((blog) => (
-                <Blog
-                    key={blog.id}
-                    blog={blog}
-                    handleVote={handleVote}
-                    handleDelete={handleDelete}
-                />
-            ))}
+            {status === 'pending' ? (
+                <div>loading data...</div>
+            ) : status === 'error' ? (
+                <div>failed to get data..</div>
+            ) : (
+                data.sort(byLikes).map((blog) => (
+                    <Blog
+                        key={blog.id}
+                        blog={blog}
+                        handleVote={handleVote}
+                        handleDelete={handleDelete}
+                    />
+                ))
+            )}
         </div>
     )
 }
