@@ -70,4 +70,23 @@ router.put('/:id', async (request, response) => {
   response.json(updatedBlog)
 })
 
+router.post('/:id/comments', async (request, response) => {
+  const { comment } = request.body
+  const blogId = request.params.id
+
+  const blog = await Blog.findById(blogId)
+  if (!blog) {
+    return response.status(404).end()
+  }
+
+  if (!comment ) {
+    return response.status(400).json({ error: 'missing comment' })
+  }   
+
+  blog.comments = !blog.comments ? [comment] : blog.comments.concat(comment)
+  const savedBlog = await blog.save()
+
+  response.status(201).json(savedBlog)
+})
+
 module.exports = router

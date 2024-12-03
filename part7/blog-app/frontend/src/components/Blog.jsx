@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import storage from '../services/storage'
+import CommentList from './Comment'
 
 const Blog = ({ blog, handleVote, handleDelete }) => {
     const [visible, setVisible] = useState(false)
@@ -88,6 +89,10 @@ export const BlogView = ({ blog, handleVote, handleDelete }) => {
             {canRemove && (
                 <button onClick={() => handleDelete(blog)}>remove</button>
             )}
+
+            <br />
+            <br />
+            <CommentList blog={blog} />
         </div>
     )
 }

@@ -209,6 +209,38 @@ describe('when there is initially some blogs saved', () => {
     assert.strictEqual(updatedBlog.likes, newBlog.likes)
   })
 
+  test('a blog can be commented', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToComment = blogsAtStart[0]
+
+    const comment = 'Great blog!'
+    await api
+      .post(`/api/blogs/${blogToComment.id}/comments`)
+      .send({comment: comment})
+      .expect(201)    
+    
+    const blogsAtEnd = await helper.blogsInDb()
+    const updatedBlog = blogsAtEnd.find(blog => blog.id === blogToComment.id)
+
+    assert(updatedBlog.comments.includes(comment))
+  })
+
+  test('a blog comment cannot be empty', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToComment = blogsAtStart[0]
+
+    const comment = ''
+    await api
+      .post(`/api/blogs/${blogToComment.id}/comments`)
+      .send({comment: comment})
+      .expect(400)    
+    
+    const blogsAtEnd = await helper.blogsInDb()
+    const updatedBlog = blogsAtEnd.find(blog => blog.id === blogToComment.id)
+
+    assert.strictEqual(updatedBlog.comments.length, blogToComment.comments.length)
+  })
+
   after(() => {
     mongoose.connection.close()
   })
