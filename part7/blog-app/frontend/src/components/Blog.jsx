@@ -64,4 +64,32 @@ Blog.propTypes = {
     handleDelete: PropTypes.func.isRequired,
 }
 
+export const BlogView = ({ blog, handleVote, handleDelete }) => {
+    if (!blog) return null
+
+    const nameOfUser = blog.user ? blog.user.name : 'anonymous'
+
+    const canRemove = blog.user ? blog.user.username === storage.me() : true
+
+    return (
+        <div className="blog">
+            <h1>{blog.title}</h1>
+            <a href={blog.url}>{blog.url}</a>
+            <div>
+                {blog.likes} likes
+                <button
+                    style={{ marginLeft: 3 }}
+                    onClick={() => handleVote(blog)}>
+                    like
+                </button>
+                <br />
+                added by {nameOfUser}
+            </div>
+            {canRemove && (
+                <button onClick={() => handleDelete(blog)}>remove</button>
+            )}
+        </div>
+    )
+}
+
 export default Blog
