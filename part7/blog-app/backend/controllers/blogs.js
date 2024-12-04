@@ -84,8 +84,8 @@ router.post('/:id/comments', async (request, response) => {
   }   
 
   blog.comments = !blog.comments ? [comment] : blog.comments.concat(comment)
-  const savedBlog = await blog.save()
-
+  var savedBlog = await blog.save()
+  savedBlog = await savedBlog.populate('user', { username: 1, name: 1 })
   response.status(201).json(savedBlog)
 })
 

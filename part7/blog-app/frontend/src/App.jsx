@@ -21,7 +21,20 @@ import {
     deleteBlog,
 } from './reducers/blogReducer'
 import { setUser } from './reducers/userReducer'
-import { Route, Routes, Link, useMatch } from 'react-router-dom'
+import { Route, Routes, Link, useMatch, useNavigate } from 'react-router-dom'
+
+import {
+    AppBar,
+    Container,
+    Typography,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableRow,
+    Paper,
+} from '@mui/material'
+import Navigation from './components/Navigation'
 
 const App = () => {
     const dispatch = useDispatch()
@@ -57,6 +70,8 @@ const App = () => {
         ? users.find((user) => user.id === userMatch.params.id)
         : null
 
+    const navigate = useNavigate()
+
     const notify = (message, type = 'success') => {
         dispatch(setNotification(message, type))
     }
@@ -75,7 +90,7 @@ const App = () => {
     const handleCreate = async (blog) => {
         const newBlog = await dispatch(createBlog(blog))
         notify(`Blog created: ${newBlog.title}, ${newBlog.author}`)
-        blogFormRef.current.toggleVisibility()
+        // blogFormRef.current.toggleVisibility()
     }
 
     const handleVote = async (blog) => {
@@ -94,13 +109,18 @@ const App = () => {
         if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
             dispatch(deleteBlog(blog))
             notify(`Blog ${blog.title}, by ${blog.author} removed`)
+            navigate('/')
         }
     }
 
     if (!user) {
         return (
             <div>
-                <h2>blogs</h2>
+                <AppBar position="static">
+                    <Container maxWidth="xl">
+                        <Typography variant="h6">BLOGS APP</Typography>
+                    </Container>
+                </AppBar>
                 <Notification />
                 <Login doLogin={handleLogin} />
             </div>
@@ -108,27 +128,13 @@ const App = () => {
     }
 
     const byLikes = (a, b) => b.likes - a.likes
-    const linkStyle = {
-        padding: 5,
-    }
 
     return (
-        <>
-            <div>
-                <Link
-                    style={linkStyle}
-                    to="/">
-                    blogs
-                </Link>
-                <Link
-                    style={linkStyle}
-                    to="/users">
-                    users
-                </Link>
-                <br />
-                {user.name} logged in
-                <button onClick={handleLogout}>logout</button>
-            </div>
+        <Container>
+            <Navigation
+                user={user}
+                doLogout={handleLogout}
+            />
             <Notification />
 
             <Routes>
@@ -154,33 +160,46 @@ const App = () => {
                     path="/"
                     element={
                         <div>
-                            <h2>blog app</h2>
-
+                            <br />
                             <Togglable
                                 buttonLabel="create new blog"
                                 ref={blogFormRef}>
-                                <NewBlog doCreate={handleCreate} />
+                                <NewBlog
+                                    doCreate={(blog) => {
+                                        handleCreate(blog)
+                                        blogFormRef.current.toggleVisibility()
+                                    }}
+                                />
                             </Togglable>
 
-                            {[...blogs].sort(byLikes).map((blog) => (
-                                <div
-                                    key={blog.id}
-                                    style={{
-                                        border: 'solid',
-                                        padding: 10,
-                                        borderWidth: 1,
-                                        marginBottom: 5,
-                                    }}>
-                                    <Link to={`/blogs/${blog.id}`}>
-                                        {blog.title}
-                                    </Link>
-                                </div>
-                            ))}
+                            <TableContainer component={Paper}>
+                                <Table>
+                                    <TableBody>
+                                        {[...blogs]
+                                            .sort(byLikes)
+                                            .map((blog) => (
+                                                <TableRow key={blog.id}>
+                                                    <TableCell>
+                                                        <Typography
+                                                            component={Link}
+                                                            to={`/blogs/${blog.id}`}
+                                                            variant="h6">
+                                                            {blog.title}
+                                                        </Typography>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {blog.user.name}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
                         </div>
                     }
                 />
             </Routes>
-        </>
+        </Container>
     )
 }
 

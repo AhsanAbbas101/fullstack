@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 
+import { Button, Stack, TextField } from '@mui/material'
+
 const NewBlog = ({ doCreate }) => {
     const [title, setTitle] = useState('')
     const [url, setUrl] = useState('')
@@ -29,34 +31,46 @@ const NewBlog = ({ doCreate }) => {
         <div>
             <h2>Create a New Blog</h2>
             <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Title:</label>
-                    <input
+                <Stack
+                    direction={'row'}
+                    spacing={2}
+                    alignItems={'center'}
+                    justifyContent="center">
+                    <TextField
+                        id="standard-basic"
+                        label="Title"
+                        variant="standard"
                         type="text"
                         data-testid="title"
                         value={title}
                         onChange={handleTitleChange}
                     />
-                </div>
-                <div>
-                    <label>URL:</label>
-                    <input
+                    <TextField
+                        id="standard-basic"
+                        label="URL"
+                        variant="standard"
                         type="text"
                         data-testid="url"
                         value={url}
                         onChange={handleUrlChange}
                     />
-                </div>
-                <div>
-                    <label>Author:</label>
-                    <input
+                    <TextField
+                        id="standard-basic"
+                        label="Author"
+                        variant="standard"
                         type="text"
                         data-testid="author"
                         value={author}
                         onChange={handleAuthorChange}
                     />
-                </div>
-                <button type="submit">Create</button>
+                    <Button
+                        type="submit"
+                        variant="contained">
+                        Create
+                    </Button>
+                </Stack>
+
+                <br />
             </form>
         </div>
     )

@@ -1,5 +1,7 @@
 import { useState } from 'react'
 
+import { Box, Stack, Button, TextField, Card, Typography } from '@mui/material'
+
 const Login = ({ doLogin }) => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
@@ -13,28 +15,43 @@ const Login = ({ doLogin }) => {
 
     return (
         <form onSubmit={handleLogin}>
-            <label>
-                Username:
-                <input
-                    type="text"
-                    data-testid="username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-            </label>
-            <label>
-                Password:
-                <input
-                    type="password"
-                    value={password}
-                    data-testid="password"
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-            </label>
-            <input
-                type="submit"
-                value="Login"
-            />
+            <Box
+                sx={{
+                    p: 2,
+
+                    textAlign: 'center',
+                }}>
+                <Typography variant="h5">Login to Blogs App</Typography>
+                <br />
+                <Stack
+                    spacing={2}
+                    alignItems={'center'}
+                    justifyContent="center">
+                    <TextField
+                        id="standard-basic"
+                        label="Username"
+                        variant="standard"
+                        data-testid="username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+
+                    <TextField
+                        id="standard-password-input"
+                        variant="standard"
+                        label="Password"
+                        type="password"
+                        value={password}
+                        data-testid="password"
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <Button
+                        variant="contained"
+                        type="submit">
+                        LOGIN
+                    </Button>
+                </Stack>
+            </Box>
         </form>
     )
 }

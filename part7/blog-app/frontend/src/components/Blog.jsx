@@ -3,6 +3,10 @@ import PropTypes from 'prop-types'
 import storage from '../services/storage'
 import CommentList from './Comment'
 
+import { Box, Typography, Button, Stack, IconButton, Link } from '@mui/material'
+import ThumbUpIcon from '@mui/icons-material/ThumbUp'
+import DeleteIcon from '@mui/icons-material/Delete'
+
 const Blog = ({ blog, handleVote, handleDelete }) => {
     const [visible, setVisible] = useState(false)
 
@@ -74,21 +78,77 @@ export const BlogView = ({ blog, handleVote, handleDelete }) => {
 
     return (
         <div className="blog">
-            <h1>{blog.title}</h1>
-            <a href={blog.url}>{blog.url}</a>
-            <div>
-                {blog.likes} likes
-                <button
-                    style={{ marginLeft: 3 }}
-                    onClick={() => handleVote(blog)}>
-                    like
-                </button>
-                <br />
-                added by {nameOfUser}
-            </div>
-            {canRemove && (
-                <button onClick={() => handleDelete(blog)}>remove</button>
-            )}
+            <Box
+                sx={{
+                    border: '1px solid #ccc',
+                    borderRadius: '8px',
+                    padding: '16px',
+                    backgroundColor: '#f9f9f9',
+                    margin: 'auto',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                }}>
+                <Typography
+                    variant="h5"
+                    gutterBottom>
+                    Blog Title: <strong>{blog.title}</strong>
+                </Typography>
+
+                <Typography
+                    variant="body1"
+                    sx={{ marginBottom: 1 }}>
+                    Author: <strong>{blog.author}</strong>
+                </Typography>
+
+                <Typography
+                    variant="body2"
+                    sx={{ marginBottom: 2 }}>
+                    URL: <a href={blog.url}>{blog.url}</a>
+                </Typography>
+                <Typography
+                    variant="body2"
+                    sx={{ marginBottom: 2 }}>
+                    Added By: {nameOfUser}
+                </Typography>
+
+                <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    spacing={2}>
+                    <Stack
+                        direction="row"
+                        alignItems="center"
+                        spacing={1}>
+                        <ThumbUpIcon color="primary" />
+                        <Typography variant="body2">
+                            Likes: {blog.likes}
+                        </Typography>
+                    </Stack>
+
+                    <Stack
+                        direction="row"
+                        spacing={1}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            size="small"
+                            onClick={() => handleVote(blog)}
+                            startIcon={<ThumbUpIcon />}>
+                            Like
+                        </Button>
+                        {canRemove && (
+                            <Button
+                                variant="contained"
+                                color="error"
+                                aria-label="delete blog"
+                                startIcon={<DeleteIcon />}
+                                onClick={() => handleDelete(blog)}>
+                                Delete
+                            </Button>
+                        )}
+                    </Stack>
+                </Stack>
+            </Box>
 
             <br />
             <br />
