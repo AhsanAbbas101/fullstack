@@ -93,6 +93,8 @@ const resolvers = {
 }
 */
 
+const setContext = require('./context').setContext
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
@@ -100,6 +102,7 @@ const server = new ApolloServer({
 
 startStandaloneServer(server, {
   listen: { port: 4000 },
+  context: setContext
 }).then(({ url }) => {
   console.log(`Server ready at ${url}`)
 })

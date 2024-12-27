@@ -1,4 +1,5 @@
 
+const { GraphQLError } = require('graphql')
 const Author = require('../author/model')
 const Book = require('./model')
 
@@ -17,10 +18,9 @@ const allBooks = async (root, args) => {
     const condition = {}
     if (args.author)
     {
-        console.log(args.author);
         const author = await Author.findOne({ name: args.author })
-        // TODO if author doesn't exists
-        condition.author = author._id
+        if (author)
+            condition.author = author._id
     }
     if (args.genre)
         condition.genres = args.genre
@@ -30,17 +30,47 @@ const allBooks = async (root, args) => {
 }
 
 // Mutations
-const addBook = async (root, args) => {    
+const addBook = async (root, args, {currentUser}) => {    
     
+    if (!currentUser) {
+        throw new GraphQLError('not authenticated', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+          }
+        })
+    }
+
     let author = await Author.findOne({ name: args.author })
     if (!author)
     {
         author = new Author({ name: args.author })
-        await author.save()
+        try {
+            await author.save()
+        } catch (error) {
+            throw new GraphQLError('Saving author failed.', {
+                extensions: {
+                    code: 'BAD_USER_INPUT',
+                    invalidArgs: args.author,
+                    error
+                }
+            })
+        }
+        
     }
 
     const book = new Book({ ...args, author: author.id })
-    return book.save()
+    try {
+        await book.save()
+    } catch (error) {
+        throw new GraphQLError('Saving book failed.', {
+                extensions: {
+                    code: 'BAD_USER_INPUT',
+                    invalidArgs: args.title,
+                    error
+                }
+            })
+    }
+    return book
 }
 
 module.exports = {

@@ -18,9 +18,41 @@ const allAuthors = async () => {
 
 // Mutations
 const editAuthor = async (root, args) => {
+
+    if (!currentUser) {
+        throw new GraphQLError('not authenticated', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+          }
+        })
+    }
+
     const author = await Author.findOne({ name: args.name })
+    if (!author)
+    {
+        throw new GraphQLError('No author found.', {
+                        extensions: {
+                            code: 'BAD_USER_INPUT',
+                            invalidArgs: args.name,
+                            error
+                        }
+                    })
+    }
+
     author.born = args.setBornTo
-    return author.save()
+
+    try {
+        await author.save()
+    } catch (error) {
+        throw new GraphQLError('Saving author failed.', {
+            extensions: {
+                code: 'BAD_USER_INPUT',
+                invalidArgs: args.setBornTo,
+                error
+            }
+        })
+    }
+    return author
 }
 
 module.exports = {
