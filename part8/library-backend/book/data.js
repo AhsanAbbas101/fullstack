@@ -29,6 +29,14 @@ const allBooks = async (root, args) => {
   
 }
 
+const allGenres = async () => {
+    const books = await Book.find({}, 'genres')
+    let genres = new Set()
+    books.forEach(book => genres = new Set([...genres, ...book.genres]))
+    return Array.from(genres)
+
+}
+
 // Mutations
 const addBook = async (root, args, {currentUser}) => {    
     
@@ -77,7 +85,8 @@ module.exports = {
     addBook,
     getAuthor,
     bookCount,
-    allBooks
+    allBooks,
+    allGenres
 }
 
 

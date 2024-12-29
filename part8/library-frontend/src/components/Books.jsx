@@ -1,56 +1,26 @@
-import { useQuery } from "@apollo/client";
-import { ALL_BOOKS } from "../queries";
+import { useState } from "react";
+import Genres from "./Genres";
+import BooksTable from "./BooksTable";
 
 const Books = (props) => {
-  const { loading, error, data } = useQuery(ALL_BOOKS);
+  const [genre, setGenre] = useState(null);
 
   if (!props.show) {
     return null;
   }
 
-  if (loading) {
-    return (
-      <div>
-        <h2>books</h2>
-        <p>Loading data</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    var messages = error.graphQLErrors.map((e) => e.message).join("\n");
-    messages += error.networkError;
-    return (
-      <div>
-        <h2>books</h2>
-        <p>Error loading data.</p>
-        <p>{messages}</p>
-      </div>
-    );
-  }
-
-  const books = data.allBooks;
-
   return (
     <div>
       <h2>books</h2>
+      {genre && (
+        <p>
+          in genre <strong>{genre}</strong>
+        </p>
+      )}
 
-      <table>
-        <tbody>
-          <tr>
-            <th></th>
-            <th>author</th>
-            <th>published</th>
-          </tr>
-          {books.map((a) => (
-            <tr key={a.title}>
-              <td>{a.title}</td>
-              <td>{a.author.name}</td>
-              <td>{a.published}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <br />
+      <BooksTable genre={genre} />
+      <Genres setGenre={setGenre} />
     </div>
   );
 };
