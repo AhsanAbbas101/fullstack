@@ -17,7 +17,7 @@ const allAuthors = async () => {
 }
 
 // Mutations
-const editAuthor = async (root, args) => {
+const editAuthor = async (root, args, {currentUser}) => {
 
     if (!currentUser) {
         throw new GraphQLError('not authenticated', {

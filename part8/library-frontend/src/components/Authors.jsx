@@ -51,7 +51,9 @@ const Authors = (props) => {
       </table>
 
       <br />
-      <AuthorForm authors={authors} setError={props.setError} />
+      {localStorage.getItem("app-token") && (
+        <AuthorForm authors={authors} setError={props.setError} />
+      )}
     </div>
   );
 };
