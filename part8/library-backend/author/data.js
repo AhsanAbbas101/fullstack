@@ -1,18 +1,26 @@
 const Author = require('./model')
 const Book = require('../book/model')
+const {GraphQLError} = require("graphql")
+const getBookCount = async (root) => {
+    return  await Book.countDocuments({author: root.id})
+}
+
 // Queries
 const authorCount = async () => {
     return Author.collection.countDocuments()
 }
 
+
 const allAuthors = async () => {
     
     const authors = await Author.find({})
-
+    return authors
+    /*
     return authors.map( async (author) => {
         const bookCount = await Book.countDocuments({author: author.id})
         return {...author.toObject(), bookCount}
     })
+    */
     
 }
 
@@ -34,7 +42,6 @@ const editAuthor = async (root, args, {currentUser}) => {
                         extensions: {
                             code: 'BAD_USER_INPUT',
                             invalidArgs: args.name,
-                            error
                         }
                     })
     }
@@ -58,5 +65,6 @@ const editAuthor = async (root, args, {currentUser}) => {
 module.exports = {
     authorCount,
     allAuthors,
-    editAuthor
+    editAuthor,
+    getBookCount
 }

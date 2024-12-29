@@ -1,3 +1,4 @@
+const data = require('./data')
 
 const typeDef = `
 type Author {
@@ -7,5 +8,13 @@ type Author {
     bookCount: Int!
 }
 `
+const typeResolver = {
+    Author: {
+        bookCount: data.getBookCount
+    }
+}
 
-module.exports = typeDef
+module.exports = {
+    typeDef,
+    typeResolver
+}

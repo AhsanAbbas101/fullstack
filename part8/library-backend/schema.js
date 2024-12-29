@@ -1,7 +1,7 @@
 
 const typeDefs = `
     ${require('./book/type').typeDef}
-    ${require('./author/type')}
+    ${require('./author/type').typeDef}
     ${require('./user/type').typeDef}
     type Query {
         ${require('./book/query').typeQuery}
@@ -17,6 +17,7 @@ const typeDefs = `
 
 const resolvers = {
     ...require('./book/type').typeResolver,
+    ...require('./author/type').typeResolver,
     Query: {
         ...require('./book/query').queryResolvers,
         ...require('./author/query').queryResolvers,

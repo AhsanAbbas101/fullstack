@@ -4,7 +4,21 @@ import { useEffect } from "react";
 
 const AuthorForm = ({ authors, setError }) => {
   const [updateAuthor, result] = useMutation(UPDATE_AUTHOR, {
-    refetchQueries: [{ query: ALL_AUTHORS }],
+    //refetchQueries: [{ query: ALL_AUTHORS }],
+    update: (cache, response) => {
+      cache.updateQuery({ query: ALL_AUTHORS }, (data) => {
+        if (!data) return undefined;
+
+        const updatedAuthor = response.data.editAuthor;
+        return {
+          allAuthors: data.allAuthors.map((author) =>
+            author.name === updatedAuthor.name
+              ? { ...author, born: updatedAuthor.born }
+              : author
+          ),
+        };
+      });
+    },
   });
 
   const handleUpdate = (event) => {
@@ -13,7 +27,7 @@ const AuthorForm = ({ authors, setError }) => {
     const name = event.target.selectedAuthor.value;
     const born = Number(event.target.born.value);
 
-    updateAuthor({ variables: { name, setBornTo: born } });
+    if (name !== "") updateAuthor({ variables: { name, setBornTo: born } });
 
     event.target.selectedAuthor.value = "";
     event.target.born.value = "";

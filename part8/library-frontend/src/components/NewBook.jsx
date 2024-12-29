@@ -11,10 +11,37 @@ const NewBook = (props) => {
   const [genres, setGenres] = useState([]);
 
   const [createNewBook] = useMutation(ADD_BOOK, {
-    refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
+    //refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
     onError: (error) => {
       const messages = error.graphQLErrors.map((e) => e.message).join("\n");
       props.setError(messages);
+    },
+    update: (cache, response) => {
+      const newBook = response.data.addBook;
+      const possible_genres = newBook.genres.concat(null); // null is added to update all books retrived in cache
+      possible_genres.map((genre) => {
+        cache.updateQuery(
+          { query: ALL_BOOKS, variables: { genre: genre } },
+          (data) => {
+            return data
+              ? {
+                  allBooks: data.allBooks.concat(newBook),
+                }
+              : undefined; // do not update if not in cache?? will be fetched once genre button is clicked!
+          }
+        );
+      });
+
+      cache.updateQuery({ query: ALL_AUTHORS }, (data) => {
+        if (!data) return undefined;
+
+        if (
+          !data.allAuthors.find((author) => author.name === newBook.author.name)
+        )
+          return {
+            allAuthors: data.allAuthors.concat(newBook.author),
+          };
+      });
     },
   });
 
