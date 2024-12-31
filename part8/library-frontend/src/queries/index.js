@@ -71,3 +71,18 @@ export const LOGGED_USER = gql`
         }
     }
 `
+
+export const BOOK_ADDED = gql`
+    subscription BookAdded {
+        bookAdded {
+            author {
+                name
+                born
+                bookCount
+            }
+            published
+            title
+            genres
+        }
+    }
+`

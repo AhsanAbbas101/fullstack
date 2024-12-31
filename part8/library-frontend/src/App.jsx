@@ -4,19 +4,33 @@ import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 import Notify from "./components/Notify";
 import LoginForm from "./components/LoginForm";
-import { useApolloClient } from "@apollo/client";
+import { useApolloClient, useSubscription } from "@apollo/client";
 import Recommend from "./components/Recommend";
+import { BOOK_ADDED, ALL_BOOKS } from "./queries";
+
+import { updateCache } from "./queries/cache";
+
 const App = () => {
   const [page, setPage] = useState("authors");
   const [errorMessage, setErrorMessage] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("app-token"));
   const client = useApolloClient();
+
   const notify = (message) => {
     setErrorMessage(message);
     setTimeout(() => {
       setErrorMessage(null);
     }, 10000);
   };
+
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data, client }) => {
+      console.log(data.data.bookAdded);
+      notify(`A new book added ${data.data.bookAdded.title}.`);
+
+      updateCache(client.cache, { query: ALL_BOOKS }, data.data.bookAdded);
+    },
+  });
 
   const doLogout = () => {
     setToken(null);

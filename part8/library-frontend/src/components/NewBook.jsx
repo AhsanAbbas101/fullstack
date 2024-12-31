@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { ADD_BOOK, ALL_BOOKS, ALL_AUTHORS } from "../queries";
 import { useMutation } from "@apollo/client";
+import { updateCache } from "../queries/cache";
 
 const NewBook = (props) => {
   const [title, setTitle] = useState("");
@@ -18,19 +19,7 @@ const NewBook = (props) => {
     },
     update: (cache, response) => {
       const newBook = response.data.addBook;
-      const possible_genres = newBook.genres.concat(null); // null is added to update all books retrived in cache
-      possible_genres.map((genre) => {
-        cache.updateQuery(
-          { query: ALL_BOOKS, variables: { genre: genre } },
-          (data) => {
-            return data
-              ? {
-                  allBooks: data.allBooks.concat(newBook),
-                }
-              : undefined; // do not update if not in cache?? will be fetched once genre button is clicked!
-          }
-        );
-      });
+      updateCache(cache, { query: ALL_BOOKS }, newBook);
 
       cache.updateQuery({ query: ALL_AUTHORS }, (data) => {
         if (!data) return undefined;
