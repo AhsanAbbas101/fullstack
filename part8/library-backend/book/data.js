@@ -3,6 +3,10 @@ const { GraphQLError } = require('graphql')
 const Author = require('../author/model')
 const Book = require('./model')
 
+const { PubSub } = require('graphql-subscriptions')
+const pubsub = new PubSub()
+
+
 const getAuthor = async (root) => {
     return Author.findById(root.author) 
 }
@@ -78,7 +82,15 @@ const addBook = async (root, args, {currentUser}) => {
                 }
             })
     }
+
+    pubsub.publish("BOOK_ADDED", {bookAdded: book})
+
     return book
+}
+
+// Subscriptions
+const bookAdded = () => {
+    return pubsub.asyncIterableIterator("BOOK_ADDED")
 }
 
 module.exports = {
@@ -86,7 +98,8 @@ module.exports = {
     getAuthor,
     bookCount,
     allBooks,
-    allGenres
+    allGenres,
+    bookAdded
 }
 
 

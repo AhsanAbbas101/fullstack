@@ -13,6 +13,9 @@ const typeDefs = `
         ${require('./author/mutation').typeMutation}
         ${require('./user/mutation').typeMutation}
     }
+    type Subscription {
+        ${require('./book/subsciption').typeSubsciption}
+    }
 `
 
 const resolvers = {
@@ -27,6 +30,9 @@ const resolvers = {
         ...require('./book/mutation').mutationResolvers,
         ...require('./author/mutation').mutationResolvers,
         ...require('./user/mutation').mutationResolvers,
+    },
+    Subscription: {
+        ...require('./book/subsciption').subscriptionResolvers
     }
 }
 
