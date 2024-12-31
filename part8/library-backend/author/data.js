@@ -1,8 +1,11 @@
 const Author = require('./model')
 const Book = require('../book/model')
-const {GraphQLError} = require("graphql")
-const getBookCount = async (root) => {
-    return  await Book.countDocuments({author: root.id})
+const { GraphQLError } = require("graphql")
+
+const getBookCount = async (root, args, {loaders}) => {
+
+    return loaders.BooksCountLoader.load(root.id)
+    //return  await Book.countDocuments({author: root.id})
 }
 
 // Queries
@@ -12,7 +15,7 @@ const authorCount = async () => {
 
 
 const allAuthors = async () => {
-    
+
     const authors = await Author.find({})
     return authors
     /*

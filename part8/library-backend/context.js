@@ -2,9 +2,13 @@
 const User = require('./user/model')
 const jwt = require('jsonwebtoken')
 
+const loaders = require('./loaders')
+
 const setContext = async ({ req, res }) => {
     const auth = req ? req.headers.authorization : null
 
+    const contextValue = {}
+  
     if (auth && auth.startsWith('Bearer ')) {
         const decodedToken = jwt.verify(
         auth.substring(7), process.env.JWT_SECRET
@@ -14,8 +18,14 @@ const setContext = async ({ req, res }) => {
         
       const currentUser = await User
         .findById(decodedToken.id)
-      return { currentUser }
-    }
+      
+      contextValue.currentUser = currentUser
+
+  }
+
+  contextValue.loaders = loaders
+  
+  return contextValue
 }
 
 module.exports = { setContext } 
