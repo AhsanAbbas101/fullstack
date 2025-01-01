@@ -43,18 +43,21 @@ const processArguments = (args: string[]) : number[] =>  {
     return values
 }
 
-
-try {
-    console.log(process.argv);
-    
-    const values = processArguments(process.argv.slice(2))
-    console.log(calculateBmi(values[0],values[1]));
-}
-catch (error: unknown) {
-    console.log('Something went wrong!');
-    
-    if (error instanceof Error)
-    {
-        console.log("Error! ", error.message);
+if (require.main === module)
+{
+    try {        
+        const values = processArguments(process.argv.slice(2))
+        console.log(calculateBmi(values[0],values[1]));
+    }
+    catch (error: unknown) {
+        console.log('Something went wrong!');
+        
+        if (error instanceof Error)
+        {
+            console.log("Error! ", error.message);
+        }
     }
 }
+
+
+export default calculateBmi

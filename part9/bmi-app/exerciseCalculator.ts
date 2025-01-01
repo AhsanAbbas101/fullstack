@@ -64,8 +64,12 @@ const processArgs = (args: string[]) : number[] =>  {
 try {
     const values = processArgs(process.argv.slice(2));
     const target = values.shift();
-    const result = calculateExercises(values, target);
-    console.log(result);
+    if (target) {
+        const result = calculateExercises(values, target);
+        console.log(result);
+    }
+    else throw new Error('Target invalid')
+    
 }
 catch (error: unknown)
 {
