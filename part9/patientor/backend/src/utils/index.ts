@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { NewPatient, Gender } from '../types';
 
 const isString = (object: unknown): object is string => {
@@ -80,3 +81,10 @@ export const validateNewPatient = (object: unknown): NewPatient => {
     throw new Error('Incorrect or missing data');
 };
 
+export const NewPatientSchema = z.object({
+    name: z.string(),
+    dateOfBirth: z.string().date(),
+    ssn: z.string().min(8).max(11),
+    gender: z.nativeEnum(Gender),
+    occupation: z.string()
+});
