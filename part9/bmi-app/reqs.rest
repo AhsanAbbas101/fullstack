@@ -1,0 +1,70 @@
+
+POST http://localhost:4000/exercises
+content-type: application/json
+
+{
+
+}
+
+###
+POST http://localhost:4000/exercises
+content-type: application/json
+
+{
+    "target": 2
+}
+
+###
+POST http://localhost:4000/exercises
+content-type: application/json
+
+{
+    "daily_exercises": "Yellow",
+    "target": 2
+}
+
+###
+POST http://localhost:4000/exercises
+content-type: application/json
+
+{
+    "daily_exercises": {"value": "yellow"},
+    "target": 2
+}
+
+###
+POST http://localhost:4000/exercises
+content-type: application/json
+
+{
+    "daily_exercises": [],
+    "target": 2
+}
+
+###
+POST http://localhost:4000/exercises
+content-type: application/json
+
+{
+    "daily_exercises": [],
+    "target": -1
+}
+
+###
+POST http://localhost:4000/exercises
+content-type: application/json
+
+{
+    "daily_exercises": [{"value": "yellow"},{"value": "yellow"}],
+    "target": -1
+}
+
+
+###
+POST http://localhost:4000/exercises
+content-type: application/json
+
+{
+    "daily_exercises": [1, 0, 2, 0, 3, 0, 2.5],
+    "target": 2.5
+}
