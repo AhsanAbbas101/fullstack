@@ -4,9 +4,9 @@ import { Gender, HealthCheckRating } from '../types';
 
 export const BaseEntrySchema = z.object({
     id: z.string(),
-    description: z.string(),
+    description: z.string().min(3),
     date: z.string().date(),
-    specialist: z.string(),
+    specialist: z.string().min(3),
     diagnosisCodes: z.optional(z.array(z.string())) //how to ensure diagnosis codes?
 }).strict();
 
@@ -17,7 +17,7 @@ export const HealthCheckEntrySchema = BaseEntrySchema.extend({
 
 export const OccupationalHealthcareEntrySchema = BaseEntrySchema.extend({
     type: z.literal('OccupationalHealthcare'),
-    employerName: z.string(),
+    employerName: z.string().min(3),
     sickLeave: z.optional(z.object({
         startDate: z.string().date(),
         endDate: z.string().date()
@@ -28,7 +28,7 @@ export const HospitalEntrySchema = BaseEntrySchema.extend({
     type: z.literal('Hospital'),
     discharge: z.object({
         date: z.string().date(),
-        criteria: z.string()
+        criteria: z.string().min(3)
     }).strict()
 });
 
