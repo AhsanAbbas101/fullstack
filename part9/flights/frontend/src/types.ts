@@ -35,4 +35,6 @@ export const DiaryEntrySchama = z.object({
 
 export type DiaryEntry = z.infer<typeof DiaryEntrySchama>;
 
-export type DiaryCommentEntry = Pick<DiaryEntry,'id'|'comment'>
+export type DiaryCommentEntry = Pick<DiaryEntry, 'id' | 'comment'>
+
+export type NewDiaryEntry = Omit<DiaryEntry, 'id'>;
