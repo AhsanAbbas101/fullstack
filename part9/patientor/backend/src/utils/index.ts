@@ -68,13 +68,14 @@ export const validateNewPatient = (object: unknown): NewPatient => {
         "dateOfBirth" in object &&
         "ssn" in object &&
         "gender" in object &&
-        "occupation" in object){
+        "occupation" in object) {
         return {
             name: parseName(object.name),
             dateOfBirth: parseDate(object.dateOfBirth),
             ssn: parseSSN(object.ssn),
             gender: parseGender(object.gender),
-            occupation: parseOccupation(object.occupation)
+            occupation: parseOccupation(object.occupation),
+            entries: []
         };
     }
 
@@ -86,5 +87,6 @@ export const NewPatientSchema = z.object({
     dateOfBirth: z.string().date(),
     ssn: z.string().min(8).max(11),
     gender: z.nativeEnum(Gender),
-    occupation: z.string()
+    occupation: z.string(),
+    entries: z.optional(z.array(z.object({})))  // edit this later
 });
