@@ -1,9 +1,9 @@
-import { NonSensitivePatient, NewPatient, Patient } from "../types";
-import { Response, Request } from 'express';
+import { NonSensitivePatient, NewPatient, Patient, EntryWithoutId, Entry } from "../types";
+import { Response, Request, } from 'express';
 
 import patientsService from "../services/patientsService";
 
-import { errorMiddleware, newPatientParser } from '../utils/middleware';
+import { errorMiddleware, newPatientParser, newEntryParser} from '../utils/middleware';
 
 import express from 'express';
 const router = express.Router();
@@ -21,6 +21,14 @@ router.get('/:id', (req, res:Response<Patient|string>) => {
     const patient = patientsService.findById(req.params.id);
     if (patient)
         res.send(patient);
+    else
+        res.sendStatus(404);
+});
+
+router.post('/:id/entries', newEntryParser, (req: Request<{id:string},unknown, EntryWithoutId>, res:Response<Entry|string>) => {
+    const entry = patientsService.addEntry(req.params.id, req.body);
+    if (entry)
+        res.send(entry);
     else
         res.sendStatus(404);
 });

@@ -1,10 +1,19 @@
 import { NextFunction, Request, Response } from 'express';
 
 
-import { PatientSchema } from './index';
+import { PatientSchema, NewEntrySchema } from './index';
 export const newPatientParser = (req: Request, _res: Response, next: NextFunction) => {
     try {
         PatientSchema.omit({id: true}).parse(req.body);
+        next();
+    } catch (error: unknown) {
+        next(error);
+    }
+};
+
+export const newEntryParser = (req: Request, _res: Response, next: NextFunction) => {
+    try {
+        NewEntrySchema.parse(req.body);
         next();
     } catch (error: unknown) {
         next(error);

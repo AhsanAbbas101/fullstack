@@ -8,7 +8,7 @@ export const BaseEntrySchema = z.object({
     date: z.string().date(),
     specialist: z.string(),
     diagnosisCodes: z.optional(z.array(z.string())) //how to ensure diagnosis codes?
-});
+}).strict();
 
 export const HealthCheckEntrySchema = BaseEntrySchema.extend({
     type: z.literal('HealthCheck'),
@@ -21,7 +21,7 @@ export const OccupationalHealthcareEntrySchema = BaseEntrySchema.extend({
     sickLeave: z.optional(z.object({
         startDate: z.string().date(),
         endDate: z.string().date()
-    }))
+    }).strict())
 });
 
 export const HospitalEntrySchema = BaseEntrySchema.extend({
@@ -29,9 +29,15 @@ export const HospitalEntrySchema = BaseEntrySchema.extend({
     discharge: z.object({
         date: z.string().date(),
         criteria: z.string()
-    })
+    }).strict()
 });
 
+
+export const NewEntrySchema = z.discriminatedUnion('type', [
+    HealthCheckEntrySchema.omit({ id: true }),
+    OccupationalHealthcareEntrySchema.omit({ id: true }),
+    HospitalEntrySchema.omit({ id: true }),
+]);
 
 export const PatientSchema = z.object({
     id: z.string(),
@@ -40,5 +46,5 @@ export const PatientSchema = z.object({
     ssn: z.string().min(8).max(11),
     gender: z.nativeEnum(Gender),
     occupation: z.string(),
-    entries: z.array(z.union([HospitalEntrySchema,OccupationalHealthcareEntrySchema,HealthCheckEntrySchema]))  
-});
+    entries: z.array(z.discriminatedUnion('type',[HospitalEntrySchema,OccupationalHealthcareEntrySchema,HealthCheckEntrySchema]))  
+}).strict();

@@ -1,4 +1,4 @@
-import { NewPatient, NonSensitivePatient, Patient } from "../types";
+import { Entry, EntryWithoutId, NewPatient, NonSensitivePatient, Patient } from "../types";
 
 import data from "../../data/patients";
 
@@ -28,4 +28,14 @@ const findById = (id: string): Patient | undefined => {
     return data.find(p => p.id === id);
 };
 
-export default { getAll, addPatient, findById };
+const addEntry = (id: string, entry: EntryWithoutId): Entry | undefined => {
+    const patient = findById(id);
+    if (patient) {
+        const newEntry = { ...entry, id: uuid() };
+        patient.entries = patient.entries.concat(newEntry);
+        return newEntry;
+    }
+    return undefined;
+};
+
+export default { getAll, addPatient, findById, addEntry };
