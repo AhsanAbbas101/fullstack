@@ -4,6 +4,7 @@ import Constants from "expo-constants";
 
 import theme from "../theme";
 import AppBarTab from "./AppBarTab";
+import useCurrentUser from "../hooks/useCurrentUser";
 
 const styles = StyleSheet.create({
   container: {
@@ -17,11 +18,19 @@ const styles = StyleSheet.create({
 });
 
 const AppBar = () => {
+  const [user, signOut] = useCurrentUser();
+
   return (
     <View style={styles.container}>
       <ScrollView horizontal>
         <AppBarTab link="/">Repositories</AppBarTab>
-        <AppBarTab link="/login">Sign In</AppBarTab>
+        {!user ? (
+          <AppBarTab link="/login">Sign In</AppBarTab>
+        ) : (
+          <AppBarTab link="/" onPress={signOut}>
+            Sign Out
+          </AppBarTab>
+        )}
       </ScrollView>
     </View>
   );

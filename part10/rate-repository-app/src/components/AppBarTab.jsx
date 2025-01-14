@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
 const AppBarTab = (props) => {
   return (
     <Pressable>
-      <Link to={props.link}>
+      <Link to={props.link} onPress={props.onPress}>
         <Text fontWeight="bold" fontSize="subheading" style={styles.heading}>
           {props.children}
         </Text>
