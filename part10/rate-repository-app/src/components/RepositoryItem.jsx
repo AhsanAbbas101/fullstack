@@ -35,10 +35,10 @@ const styles = StyleSheet.create({
 
 const RespositoryItem = ({ item }) => {
   return (
-    <View style={styles.container}>
+    <View testID="repositoryItem" style={styles.container}>
       <View style={styles.row_item_1}>
         <View style={{ justifySelf: "center" }}>
-          <Image style={styles.avatar} source={item.ownerAvatarUrl} />
+          <Image style={styles.avatar} source={{ uri: item.ownerAvatarUrl }} />
         </View>
         <View
           style={{
