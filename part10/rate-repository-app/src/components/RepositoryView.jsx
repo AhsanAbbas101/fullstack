@@ -4,8 +4,18 @@ import RespositoryItem from "./RepositoryItem";
 import { useQuery } from "@apollo/client";
 import { GET_SINGLE_REPO } from "../graphql/queries";
 
-import { View } from "react-native";
+import { FlatList, View, StyleSheet } from "react-native";
 import Text from "./core/Text";
+import ReviewItem from "./ReviewItem";
+
+const styles = StyleSheet.create({
+  separator: {
+    height: 15,
+    backgroundColor: "#e1e5e8",
+  },
+});
+
+const ItemSeparator = () => <View style={styles.separator} />;
 
 const RepositoryView = () => {
   // get repo item using id
@@ -41,7 +51,22 @@ const RepositoryView = () => {
     );
   }
 
-  return <RespositoryItem item={data.repository} isExpanded />;
+  //return <RespositoryItem item={data.repository} isExpanded />;
+  console.log(data);
+  const repository = data.repository;
+  const reviews = repository.reviews.edges.map((e) => e.node);
+
+  return (
+    <FlatList
+      data={reviews}
+      renderItem={({ item }) => <ReviewItem review={item} />}
+      keyExtractor={({ id }) => id}
+      ListHeaderComponent={() => (
+        <RespositoryItem item={repository} isExpanded />
+      )}
+      ItemSeparatorComponent={ItemSeparator}
+    />
+  );
 };
 
 export default RepositoryView;
