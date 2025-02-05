@@ -1,4 +1,4 @@
-import { View, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, Image, Button, Linking } from "react-native";
 import Text from "./core/Text";
 import RepoItemStat from "./RepoItemStat";
 import theme from "../theme";
@@ -20,6 +20,10 @@ const styles = StyleSheet.create({
     gridTemplateColumns: "repeat(4, 1fr)",
     placeItems: "center",
   },
+  row_item_3: {
+    display: "grid",
+    padding: 10,
+  },
   avatar: {
     width: 50,
     height: 50,
@@ -33,7 +37,14 @@ const styles = StyleSheet.create({
   },
 });
 
-const RespositoryItem = ({ item }) => {
+const RespositoryItem = ({ item, isExpanded = false }) => {
+  if (!item) return null;
+
+  const handleOnClick = () => {
+    console.log("pressed " + item.url);
+    Linking.openURL(item.url);
+  };
+
   return (
     <View testID="repositoryItem" style={styles.container}>
       <View style={styles.row_item_1}>
@@ -62,6 +73,11 @@ const RespositoryItem = ({ item }) => {
         <RepoItemStat stat="Reviews" value={item.reviewCount} />
         <RepoItemStat stat="Rating" value={item.ratingAverage} />
       </View>
+      {isExpanded && (
+        <View style={styles.row_item_3}>
+          <Button title="Open in Github" onPress={handleOnClick} />
+        </View>
+      )}
     </View>
   );
 };

@@ -28,6 +28,16 @@ query Repositories {
 ${REPO_FRAGMENT}    
 `;
 
+export const GET_SINGLE_REPO = gql`
+query Repository($repositoryId: ID!) {
+  repository(id: $repositoryId) {
+    ...RepoDetails
+    url
+  }
+}
+${REPO_FRAGMENT}
+`
+
 export const ME = gql`
 query Me {
   me {
