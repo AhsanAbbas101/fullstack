@@ -41,7 +41,6 @@ const RespositoryItem = ({ item, isExpanded = false }) => {
   if (!item) return null;
 
   const handleOnClick = () => {
-    console.log("pressed " + item.url);
     Linking.openURL(item.url);
   };
 

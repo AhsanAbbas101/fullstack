@@ -25,6 +25,7 @@ const RepositoryView = () => {
     variables: {
       repositoryId: repoId,
     },
+    fetchPolicy: "cache-and-network",
   });
 
   if (!repoId) {
@@ -51,8 +52,6 @@ const RepositoryView = () => {
     );
   }
 
-  //return <RespositoryItem item={data.repository} isExpanded />;
-  console.log(data);
   const repository = data.repository;
   const reviews = repository.reviews.edges.map((e) => e.node);
 

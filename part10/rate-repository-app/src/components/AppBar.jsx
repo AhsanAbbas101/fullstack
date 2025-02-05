@@ -27,9 +27,12 @@ const AppBar = () => {
         {!user ? (
           <AppBarTab link="/login">Sign In</AppBarTab>
         ) : (
-          <AppBarTab link="/" onPress={signOut}>
-            Sign Out
-          </AppBarTab>
+          <>
+            <AppBarTab link="/review/new">Create a review</AppBarTab>
+            <AppBarTab link="/" onPress={signOut}>
+              Sign Out
+            </AppBarTab>
+          </>
         )}
       </ScrollView>
     </View>

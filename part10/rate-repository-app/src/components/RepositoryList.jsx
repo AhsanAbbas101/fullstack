@@ -22,7 +22,6 @@ export const RepositoryListContainer = ({ repositories }) => {
 
   const handleRepoClick = (repoId) => {
     console.log("Route navigate: " + `/repo/${repoId}`);
-
     navigate(`/repo/${repoId}`);
   };
 
