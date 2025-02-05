@@ -28,8 +28,8 @@ fragment ReviewDetails on Review {
 `
 
 export const GET_REPOS = gql`
-query Repositories {
-  repositories {
+query Repositories($orderBy: AllRepositoriesOrderBy, $orderDirection: OrderDirection) {
+  repositories(orderBy: $orderBy, orderDirection: $orderDirection) {
     edges {
       node {
         ...RepoDetails
