@@ -18,8 +18,6 @@ const useCurrentUser = () => {
     }, [result.data])
 
     const signOut = async () => {
-        console.log('signout');
-
         await authStore.removeAccessToken();
         await apolloClient.resetStore();
     }
