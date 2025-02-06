@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-native";
 import { useMutation } from "@apollo/client";
 import { CREATE_REVIEW } from "../graphql/mutations";
 import { useState } from "react";
+import { ME } from "../graphql/queries";
 
 const styles = StyleSheet.create({
   container: {
@@ -185,6 +186,7 @@ const ReviewForm = () => {
     onError: (error) => {
       setApiError(error.message);
     },
+    refetchQueries: [{ query: ME, variables: { includeReviews: true } }],
   });
 
   const onSubmit = async (values) => {

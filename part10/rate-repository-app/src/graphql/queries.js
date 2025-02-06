@@ -20,6 +20,7 @@ fragment ReviewDetails on Review {
   text
   rating
   createdAt
+  repositoryId
   user {
     id
     username
@@ -59,10 +60,18 @@ ${REVIEW_FRAGMEMT}
 `
 
 export const ME = gql`
-query Me {
+query Me($includeReviews: Boolean = false) {
   me {
     id
     username
+    reviews @include(if: $includeReviews) {
+      edges {
+        node {
+          ...ReviewDetails
+        }
+      }
+    }
   }
 }
+${REVIEW_FRAGMEMT}
 `
