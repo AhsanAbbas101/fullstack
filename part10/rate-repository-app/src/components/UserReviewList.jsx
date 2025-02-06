@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet, View, Alert } from "react-native";
 import useCurrentUser from "../hooks/useCurrentUser";
 import Text from "./core/Text";
 import ReviewItem from "./ReviewItem";
@@ -45,13 +45,29 @@ const UserReviewList = () => {
 
   const reviews = user.reviews.edges.map((e) => e.node);
 
-  const handleDelete = async (reviewId) => {
-    await deleteReview({
-      variables: {
-        deleteReviewId: reviewId,
-      },
-    });
-    refetch();
+  const handleDelete = (reviewId) => {
+    Alert.alert(
+      "Delete review",
+      "Are you sure you want to delete this review?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: async () => {
+            await deleteReview({
+              variables: {
+                deleteReviewId: reviewId,
+              },
+            });
+            refetch();
+          },
+        },
+      ]
+    );
   };
   const handleView = (repoId) => {
     navigate(`/repo/${repoId}`);
