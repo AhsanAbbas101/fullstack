@@ -29,12 +29,22 @@ fragment ReviewDetails on Review {
 `
 
 export const GET_REPOS = gql`
-query Repositories($searchKeyword: String, $orderBy: AllRepositoriesOrderBy, $orderDirection: OrderDirection) {
-  repositories(searchKeyword: $searchKeyword, orderBy: $orderBy, orderDirection: $orderDirection) {
+query Repositories($searchKeyword: String, $orderBy: AllRepositoriesOrderBy, $orderDirection: OrderDirection, $first: Int, $after: String) {
+  repositories(
+   searchKeyword: $searchKeyword,
+   orderBy: $orderBy,
+   orderDirection: $orderDirection,
+   first: $first,
+   after: $after) {
     edges {
       node {
         ...RepoDetails
       }
+      cursor
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
     }
   }
 }
@@ -42,15 +52,20 @@ ${REPO_FRAGMENT}
 `;
 
 export const GET_SINGLE_REPO = gql`
-query Repository($repositoryId: ID!) {
+query Repository($repositoryId: ID!, $first: Int, $after: String) {
   repository(id: $repositoryId) {
     ...RepoDetails
     url
-    reviews {
+    reviews(first: $first, after: $after) {
       edges {
         node {
           ...ReviewDetails
         }
+        cursor
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
       }
     }
   }

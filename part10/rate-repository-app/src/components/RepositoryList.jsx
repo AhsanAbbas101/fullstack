@@ -101,7 +101,7 @@ export class RepositoryListContainer extends React.Component {
   };
 
   render() {
-    const { repositories, handleRepoClick } = this.props;
+    const { repositories, handleRepoClick, onEndReach } = this.props;
 
     // Get the nodes from the edges array
     const repositoryNodes = repositories
@@ -119,6 +119,8 @@ export class RepositoryListContainer extends React.Component {
         )}
         keyExtractor={(item) => item.id}
         ListHeaderComponent={this.renderHeader}
+        onEndReached={onEndReach}
+        onEndReachedThreshold={0.5}
       />
     );
   }
@@ -130,14 +132,20 @@ const RepositoryList = () => {
   const { orderBy, orderDirection } = repoOrderStates[order].value;
   const [searchText, setSearchText] = useState("");
   const [searchKeyword] = useDebounce(searchText, 1000);
-  const { repositories } = useRepositories(
+  const { repositories, fetchMore } = useRepositories({
     searchKeyword,
     orderBy,
-    orderDirection
-  );
+    orderDirection,
+    first: 8,
+  });
 
   const handleRepoClick = (repoId) => {
     navigate(`/repo/${repoId}`);
+  };
+
+  const onEndReach = () => {
+    console.log("You have reached the end of the list");
+    fetchMore();
   };
 
   return (
@@ -148,6 +156,7 @@ const RepositoryList = () => {
       searchText={searchText}
       setSearchText={setSearchText}
       handleRepoClick={handleRepoClick}
+      onEndReach={onEndReach}
     />
   );
 };

@@ -21,12 +21,29 @@ const RepositoryView = () => {
   // get repo item using id
   let { repoId } = useParams();
 
-  const { loading, error, data } = useQuery(GET_SINGLE_REPO, {
-    variables: {
-      repositoryId: repoId,
-    },
+  const variables = {
+    repositoryId: repoId,
+    first: 8,
+  };
+
+  const { loading, error, data, fetchMore } = useQuery(GET_SINGLE_REPO, {
+    variables,
     fetchPolicy: "cache-and-network",
   });
+
+  const handleFetchMore = () => {
+    const canFetchMore =
+      !loading && data?.repository.reviews.pageInfo.hasNextPage;
+
+    if (!canFetchMore) return;
+
+    fetchMore({
+      variables: {
+        after: data?.repository.reviews.pageInfo.endCursor,
+        ...variables,
+      },
+    });
+  };
 
   if (!repoId) {
     return (
@@ -39,7 +56,7 @@ const RepositoryView = () => {
   if (loading) {
     return (
       <View>
-        <Text>Fetching Repository: {repoId}</Text>
+        <Text>Loading Repository: {repoId}</Text>
       </View>
     );
   }
@@ -64,6 +81,8 @@ const RepositoryView = () => {
         <RespositoryItem item={repository} isExpanded />
       )}
       ItemSeparatorComponent={ItemSeparator}
+      onEndReached={handleFetchMore}
+      onEndReachedThreshold={0.5}
     />
   );
 };
